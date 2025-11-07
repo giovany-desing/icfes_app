@@ -1,9 +1,6 @@
 import streamlit as st
 import numpy as np
 import pandas as pd
-import plotly.express as px
-import plotly.graph_objects as go
-from plotly.subplots import make_subplots
 import warnings
 warnings.filterwarnings('ignore')
 
@@ -153,6 +150,33 @@ st.markdown("""
         font-weight: 500;
         color: #00ff87;
     }
+    
+    .pipeline-step {
+        background: rgba(0, 245, 255, 0.1);
+        padding: 1.5rem;
+        border-radius: 12px;
+        border-left: 4px solid #00f5ff;
+        margin: 1rem 0;
+    }
+    
+    .progress-bar {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+        height: 30px;
+        margin: 1rem 0;
+        overflow: hidden;
+    }
+    
+    .progress-fill {
+        background: linear-gradient(90deg, #00f5ff, #00ff87);
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #000;
+        font-weight: 600;
+        transition: width 0.3s ease;
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -170,7 +194,7 @@ st.markdown('''
 <div style="text-align: center; margin: 2rem 0;">
     <a href="https://github.com/tu-usuario/proyecto-icfes" target="_blank" class="github-button">
         🔗 Ver Código en GitHub
-
+    </a>
 </div>
 ''', unsafe_allow_html=True)
 
@@ -313,28 +337,33 @@ elif section == "🔬 Metodología ML":
         </div>
         """, unsafe_allow_html=True)
     
-    # Pipeline de procesamiento
+    # Pipeline de procesamiento con tarjetas visuales
     st.markdown("""
     <div class="section-card">
         <h3>🔄 Pipeline de Procesamiento de Datos</h3>
     </div>
     """, unsafe_allow_html=True)
     
-    # Diagrama de flujo simplificado
-    flow_data = {
-        'Etapa': ['1. Extracción', '2. Limpieza', '3. Feature Engineering', '4. Entrenamiento', '5. Validación'],
-        'Proceso': ['Datos ICFES 2019', 'Normalización y valores faltantes', 'Escalado y transformación', 
-                    'Gradient Boosting', 'Cross-Validation (k=5)']
-    }
-    df_flow = pd.DataFrame(flow_data)
+    pipeline_steps = [
+        ("1. Extracción", "Datos ICFES 2019", "📥"),
+        ("2. Limpieza", "Normalización y valores faltantes", "🧹"),
+        ("3. Feature Engineering", "Escalado y transformación", "⚙️"),
+        ("4. Entrenamiento", "Gradient Boosting", "🤖"),
+        ("5. Validación", "Cross-Validation (k=5)", "✅")
+    ]
     
-    fig = px.funnel(df_flow, x='Etapa', y=[1,1,1,1,1], text='Proceso')
-    fig.update_layout(
-        template='plotly_dark',
-        height=400,
-        showlegend=False
-    )
-    st.plotly_chart(fig, use_container_width=True)
+    for step, desc, icon in pipeline_steps:
+        st.markdown(f"""
+        <div class="pipeline-step">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <div style="font-size: 2rem;">{icon}</div>
+                <div>
+                    <div style="font-size: 1.2rem; font-weight: 700; color: #00f5ff;">{step}</div>
+                    <div style="color: rgba(255,255,255,0.7); margin-top: 0.3rem;">{desc}</div>
+                </div>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
 
 # SECCIÓN 3: IMPLEMENTACIÓN MLOPS
 elif section == "⚙️ Implementación MLOps":
@@ -404,37 +433,39 @@ elif section == "⚙️ Implementación MLOps":
         </div>
         """, unsafe_allow_html=True)
     
-    # Flujo MLOps
+    # Flujo MLOps con barras de progreso
     st.markdown("""
     <div class="section-card">
         <h3>🔄 Flujo Completo de MLOps</h3>
     </div>
     """, unsafe_allow_html=True)
     
-    mlops_stages = {
-        'Etapa': ['Data Versioning', 'Experiment Tracking', 'Model Training', 'Model Registry', 'Deployment', 'Monitoring'],
-        'Herramienta': ['DVC', 'MLflow', 'Scikit-learn', 'MLflow', 'Docker + FastAPI', 'Prometheus'],
-        'Estado': ['✅', '✅', '✅', '✅', '✅', '🔄']
-    }
-    df_mlops = pd.DataFrame(mlops_stages)
+    mlops_stages = [
+        ("Data Versioning", "DVC", 100, "✅"),
+        ("Experiment Tracking", "MLflow", 100, "✅"),
+        ("Model Training", "Scikit-learn", 100, "✅"),
+        ("Model Registry", "MLflow", 100, "✅"),
+        ("Deployment", "Docker + FastAPI", 100, "✅"),
+        ("Monitoring", "Prometheus", 75, "🔄")
+    ]
     
-    fig_mlops = px.timeline(
-        df_mlops, 
-        x_start=[0, 1, 2, 3, 4, 5], 
-        x_end=[1, 2, 3, 4, 5, 6],
-        y='Etapa',
-        color='Estado',
-        text='Herramienta'
-    )
-    fig_mlops.update_layout(
-        template='plotly_dark',
-        height=400,
-        xaxis_title='Progreso',
-        showlegend=True
-    )
-    st.plotly_chart(fig_mlops, use_container_width=True)
+    for stage, tool, progress, status in mlops_stages:
+        st.markdown(f"""
+        <div class="section-card" style="padding: 1rem; margin: 0.5rem 0;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                <div>
+                    <span style="font-weight: 700; color: #00f5ff;">{stage}</span>
+                    <span style="color: rgba(255,255,255,0.6); margin-left: 0.5rem;">• {tool}</span>
+                </div>
+                <span style="font-size: 1.5rem;">{status}</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: {progress}%;">{progress}%</div>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
 
-# SECCIÓN 4: ARQUITECTURA
+# SECCIÓN 4: STACK TECNOLÓGICO
 elif section == "📊 Stack Tecnológico":
     # Stack tecnológico
     st.markdown("""
@@ -504,8 +535,6 @@ proyecto-icfes/
         </pre>
     </div>
     """, unsafe_allow_html=True)
-    
-
 
 # SECCIÓN 5: DOCUMENTACIÓN
 elif section == "📚 Documentación":
@@ -677,25 +706,32 @@ else:  # Resultados
         </div>
         """, unsafe_allow_html=True)
     
-    # Importancia de features (simulado)
-    features_importance = {
+    # Importancia de features
+    st.markdown("""
+    <div class="section-card">
+        <h3>📊 Importancia de Features en el Modelo</h3>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    features_data = {
         'Feature': ['Razonamiento Cuantitativo', 'Lectura Crítica', 'Inglés', 
                    'Competencias Ciudadanas', 'Comunicación Escrita'],
         'Importancia': [0.32, 0.28, 0.22, 0.11, 0.07]
     }
-    df_imp = pd.DataFrame(features_importance)
     
-    fig_imp = px.bar(
-        df_imp, 
-        x='Importancia', 
-        y='Feature',
-        orientation='h',
-        title='Importancia de Features en el Modelo',
-        color='Importancia',
-        color_continuous_scale='Viridis'
-    )
-    fig_imp.update_layout(template='plotly_dark', height=400)
-    st.plotly_chart(fig_imp, use_container_width=True)
+    for feature, importance in zip(features_data['Feature'], features_data['Importancia']):
+        percentage = int(importance * 100)
+        st.markdown(f"""
+        <div class="section-card" style="padding: 1rem; margin: 0.5rem 0;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                <span style="font-weight: 600; color: rgba(255,255,255,0.9);">{feature}</span>
+                <span style="color: #00f5ff; font-weight: 700;">{percentage}%</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: {percentage}%;"></div>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
     
     # Comparación de modelos
     st.markdown("""
@@ -712,24 +748,78 @@ else:  # Resultados
     }
     df_comp = pd.DataFrame(models_comparison)
     
-    fig_comp = px.scatter(
-        df_comp,
-        x='RMSE',
-        y='R² Score',
-        size='Tiempo (s)',
-        color='Modelo',
-        title='Comparación de Modelos: Precisión vs Error',
-        hover_data=['RMSE', 'R² Score', 'Tiempo (s)']
-    )
-    fig_comp.update_layout(template='plotly_dark', height=500)
-    st.plotly_chart(fig_comp, use_container_width=True)
-    
-    # Tabla de comparación
+    # Mostrar tabla con estilos
     st.dataframe(
-        df_comp.style.highlight_max(subset=['R² Score'], color='lightgreen')
-                     .highlight_min(subset=['RMSE', 'Tiempo (s)'], color='lightgreen'),
+        df_comp.style.highlight_max(subset=['R² Score'], color='rgba(0, 255, 135, 0.3)')
+                     .highlight_min(subset=['RMSE', 'Tiempo (s)'], color='rgba(0, 255, 135, 0.3)')
+                     .format({'R² Score': '{:.3f}', 'RMSE': '{:.1f}', 'Tiempo (s)': '{:.1f}'}),
         use_container_width=True
     )
+    
+    # Representación visual de comparación de modelos
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.markdown("""
+        <div class="section-card">
+            <h4>🏆 Mejor Precisión (R² Score)</h4>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        for i, (model, score) in enumerate(zip(models_comparison['Modelo'], models_comparison['R² Score'])):
+            rank = i + 1
+            medal = "🥇" if rank == 1 else "🥈" if rank == 2 else "🥉" if rank == 3 else "🔹"
+            score_pct = int(score * 100)
+            
+            st.markdown(f"""
+            <div class="section-card" style="padding: 0.8rem; margin: 0.3rem 0;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <span style="font-size: 1.5rem;">{medal}</span>
+                        <span style="font-weight: 600;">{model}</span>
+                    </div>
+                    <span style="color: #00f5ff; font-weight: 700;">{score:.3f}</span>
+                </div>
+                <div class="progress-bar" style="height: 8px; margin-top: 0.5rem;">
+                    <div class="progress-fill" style="width: {score_pct}%;"></div>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+    
+    with col2:
+        st.markdown("""
+        <div class="section-card">
+            <h4>⚡ Menor Error (RMSE)</h4>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        # Ordenar por RMSE ascendente
+        sorted_indices = sorted(range(len(models_comparison['RMSE'])), 
+                              key=lambda i: models_comparison['RMSE'][i])
+        
+        for rank, i in enumerate(sorted_indices, 1):
+            model = models_comparison['Modelo'][i]
+            rmse = models_comparison['RMSE'][i]
+            medal = "🥇" if rank == 1 else "🥈" if rank == 2 else "🥉" if rank == 3 else "🔹"
+            
+            # Invertir para visualización (menor es mejor)
+            max_rmse = max(models_comparison['RMSE'])
+            error_pct = int((1 - rmse/max_rmse) * 100)
+            
+            st.markdown(f"""
+            <div class="section-card" style="padding: 0.8rem; margin: 0.3rem 0;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <span style="font-size: 1.5rem;">{medal}</span>
+                        <span style="font-weight: 600;">{model}</span>
+                    </div>
+                    <span style="color: #00f5ff; font-weight: 700;">{rmse:.1f}</span>
+                </div>
+                <div class="progress-bar" style="height: 8px; margin-top: 0.5rem;">
+                    <div class="progress-fill" style="width: {error_pct}%;"></div>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
     
     # Próximos pasos
     st.markdown("""
@@ -754,7 +844,7 @@ st.markdown("""
         <strong>🎓 Proyecto ICFES - Machine Learning con MLOps</strong>
     </p>
     <p style='margin: 0.5rem 0;'>
-        Desarrollado por: Egar Yovany Samaca Acuña, Cientifico de datos Junior
+        Desarrollado por: Egar Yovany Samaca Acuña, Científico de datos Junior
     </p>
     <p style='margin: 0.5rem 0;'>
         📧 Contacto: egsamaca56@gmail.com | 
