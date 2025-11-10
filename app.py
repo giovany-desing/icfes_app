@@ -410,7 +410,7 @@ st.markdown("""
         Predicción del puntaje global ICFES mediante Gradient Boosting
     </div>
     <div class="hero-cta">
-        <a href="https://github.com/tu-usuario/proyecto-icfes" target="_blank" class="apple-button">
+        <a href="https://github.com/giovany-desing/proyecto_icfes" target="_blank" class="apple-button">
             Ver Codigo en GitHub
 
 </div>
