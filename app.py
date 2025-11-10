@@ -2,589 +2,644 @@ import streamlit as st
 import numpy as np
 import pandas as pd
 import warnings
+from pathlib import Path
+from PIL import Image
 warnings.filterwarnings('ignore')
 
-IMAGE_PATH = "imagenes/distribucion.png"
+
+def load_image(image_path):
+    """Carga una imagen de forma segura con múltiples intentos de ruta"""
+    possible_paths = [
+        image_path,
+        Path(image_path),
+        Path(__file__).parent / image_path,
+        Path.cwd() / image_path,
+    ]
+    
+    for path in possible_paths:
+        try:
+            if Path(path).exists():
+                return Image.open(path)
+        except Exception as e:
+            continue
+    
+    st.error(f"""
+    ⚠️ **Image not found:** `{image_path}`
+    
+    **Paths tried:**
+    - `{Path.cwd() / image_path}`
+    - `{Path(__file__).parent / image_path}`
+    
+    **Please ensure:**
+    - File exists in the same folder as `app.py`
+    - Filename matches exactly (case-sensitive)
+    - File is a valid image (.png, .jpg, etc.)
+    """)
+    return None
+
 
 # Configuración de la página
 st.set_page_config(
     page_title="Proyecto ICFES - MLOps",
     page_icon="📊",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="collapsed"
 )
 
-# CSS personalizado
+# CSS personalizado estilo Apple
 st.markdown("""
 <style>
+    @import url('https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600;700&display=swap');
+    
+    * {
+        font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
+    }
+    
     .stApp {
-        background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
-        background-attachment: fixed;
+        background: #000000;
+        color: #f5f5f7;
+    }
+    
+    /* Ocultar sidebar completamente */
+    [data-testid="stSidebar"] {
+        display: none;
     }
     
     .main .block-container {
-        background: rgba(255, 255, 255, 0.05);
-        backdrop-filter: blur(20px);
-        border-radius: 24px;
-        padding: 3rem;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        padding: 0;
+        max-width: 100%;
     }
     
-    .main-header {
-        font-size: 3.5rem;
-        font-weight: 800;
-        background: linear-gradient(135deg, #00f5ff, #00ff87, #00f5ff);
+    /* Hero Section - Estilo Apple */
+    .hero-section {
+        text-align: center;
+        padding: 8rem 2rem 6rem;
+        background: linear-gradient(180deg, #000 0%, #0a0a0a 100%);
+    }
+    
+    .hero-title {
+        font-size: 5rem;
+        font-weight: 700;
+        background: linear-gradient(90deg, #fff 0%, #999 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
+        margin-bottom: 1.5rem;
+        letter-spacing: -0.03em;
+        line-height: 1.05;
+    }
+    
+    .hero-subtitle {
+        font-size: 1.75rem;
+        font-weight: 400;
+        color: #86868b;
+        margin-bottom: 2.5rem;
+        line-height: 1.4;
+        max-width: 900px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    
+    .hero-cta {
+        display: inline-flex;
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+    
+    /* Botones estilo Apple */
+    .apple-button {
+        background: #0071e3;
+        color: white !important;
+        padding: 1rem 2rem;
+        border-radius: 980px;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-weight: 400;
+        font-size: 1.0625rem;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border: none;
+        cursor: pointer;
+    }
+    
+    .apple-button:hover {
+        background: #0077ed;
+        transform: scale(1.02);
+    }
+    
+    .apple-button-outline {
+        background: transparent;
+        color: #0071e3 !important;
+        border: 1px solid #0071e3;
+    }
+    
+    .apple-button-outline:hover {
+        background: rgba(0, 113, 227, 0.1);
+    }
+    
+    /* Secciones con padding consistente */
+    .content-section {
+        padding: 5rem 10%;
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+    
+    .section-dark {
+        background: #000000;
+    }
+    
+    .section-light {
+        background: #0a0a0a;
+    }
+    
+    /* Cards estilo Apple */
+    .apple-card {
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 18px;
+        padding: 2.5rem;
+        margin: 1.5rem 0;
+        border: 0.5px solid rgba(255, 255, 255, 0.1);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        backdrop-filter: blur(20px);
+    }
+    
+    .apple-card:hover {
+        background: rgba(255, 255, 255, 0.05);
+        border-color: rgba(255, 255, 255, 0.2);
+        transform: translateY(-4px);
+    }
+    
+    .card-title {
+        font-size: 2rem;
+        font-weight: 600;
+        color: #f5f5f7;
+        margin-bottom: 1rem;
+        letter-spacing: -0.02em;
+    }
+    
+    .card-subtitle {
+        font-size: 1.125rem;
+        color: #86868b;
+        line-height: 1.6;
+        font-weight: 400;
+    }
+    
+    .section-title {
+        font-size: 3.5rem;
+        font-weight: 700;
+        color: #f5f5f7;
         text-align: center;
         margin-bottom: 1rem;
-        text-shadow: 0 0 30px rgba(0, 245, 255, 0.5);
+        letter-spacing: -0.03em;
     }
     
-    .sub-header {
-        font-size: 1.3rem;
-        color: rgba(255, 255, 255, 0.8);
+    .section-subtitle {
+        font-size: 1.5rem;
+        color: #86868b;
         text-align: center;
-        margin-bottom: 3rem;
-        line-height: 1.6;
+        margin-bottom: 4rem;
+        max-width: 800px;
+        margin-left: auto;
+        margin-right: auto;
     }
     
-    .section-card {
-        background: rgba(255, 255, 255, 0.08);
-        backdrop-filter: blur(15px);
+    /* Métricas estilo Apple Watch */
+    .metric-ring {
+        background: linear-gradient(135deg, rgba(0, 113, 227, 0.1) 0%, rgba(0, 113, 227, 0.05) 100%);
+        border-radius: 20px;
         padding: 2rem;
-        border-radius: 20px;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        margin: 1.5rem 0;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-    }
-    
-    .section-card:hover {
-        transform: translateY(-5px);
-        border: 1px solid rgba(0, 245, 255, 0.3);
-        box-shadow: 0 8px 30px rgba(0, 245, 255, 0.2);
-    }
-    
-    .feature-badge {
-        background: linear-gradient(135deg, #00f5ff, #00ff87);
-        color: #000;
-        padding: 0.4rem 1rem;
-        border-radius: 20px;
-        font-weight: 600;
-        display: inline-block;
-        margin: 0.3rem;
-        font-size: 0.9rem;
-    }
-    
-    .github-button {
-        background: linear-gradient(135deg, #6e48aa, #9d50bb);
-        color: white !important;
-        padding: 1rem 2rem;
-        border-radius: 15px;
-        text-decoration: none;
-        display: inline-block;
-        font-weight: 600;
-        margin: 1rem 0.5rem;
-        transition: all 0.3s ease;
-        border: 2px solid rgba(255, 255, 255, 0.2);
-    }
-    
-    .github-button:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 10px 25px rgba(157, 80, 187, 0.4);
-    }
-    
-    .api-button {
-        background: linear-gradient(135deg, #f093fb, #f5576c);
-        color: white !important;
-        padding: 1rem 2rem;
-        border-radius: 15px;
-        text-decoration: none;
-        display: inline-block;
-        font-weight: 600;
-        margin: 1rem 0.5rem;
-        transition: all 0.3s ease;
-        border: 2px solid rgba(255, 255, 255, 0.2);
-    }
-    
-    .api-button:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 10px 25px rgba(245, 87, 108, 0.4);
-    }
-    
-    .metric-box {
-        background: rgba(0, 245, 255, 0.1);
-        padding: 1.5rem;
-        border-radius: 15px;
-        border: 1px solid rgba(0, 245, 255, 0.3);
         text-align: center;
-        margin: 0.5rem;
+        border: 1px solid rgba(0, 113, 227, 0.2);
+        transition: all 0.3s ease;
+    }
+    
+    .metric-ring:hover {
+        border-color: rgba(0, 113, 227, 0.4);
+        transform: scale(1.05);
     }
     
     .metric-value {
-        font-size: 2rem;
-        font-weight: 700;
-        color: #00f5ff;
+        font-size: 3.5rem;
+        font-weight: 600;
+        color: #0071e3;
+        letter-spacing: -0.03em;
     }
     
     .metric-label {
-        font-size: 0.9rem;
-        color: rgba(255, 255, 255, 0.7);
+        font-size: 1rem;
+        color: #86868b;
         margin-top: 0.5rem;
+        font-weight: 400;
     }
     
-    .tech-stack {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 1rem;
-        margin: 1rem 0;
-    }
-    
-    .tech-item {
-        background: rgba(0, 255, 135, 0.15);
-        padding: 0.7rem 1.2rem;
-        border-radius: 12px;
-        border: 1px solid rgba(0, 255, 135, 0.3);
+    /* Feature badges estilo iOS */
+    .ios-badge {
+        display: inline-block;
+        background: rgba(0, 113, 227, 0.15);
+        color: #0071e3;
+        padding: 0.5rem 1rem;
+        border-radius: 100px;
+        font-size: 0.875rem;
         font-weight: 500;
-        color: #00ff87;
+        margin: 0.25rem;
+        border: 0.5px solid rgba(0, 113, 227, 0.3);
     }
     
-    .pipeline-step {
-        background: rgba(0, 245, 255, 0.1);
-        padding: 1.5rem;
+    /* Lista minimalista */
+    .apple-list {
+        list-style: none;
+        padding: 0;
+    }
+    
+    .apple-list li {
+        padding: 1rem 0;
+        border-bottom: 0.5px solid rgba(255, 255, 255, 0.1);
+        font-size: 1.0625rem;
+        color: #f5f5f7;
+        line-height: 1.6;
+    }
+    
+    .apple-list li:last-child {
+        border-bottom: none;
+    }
+    
+    /* Código estilo Xcode */
+    pre {
+        background: #1e1e1e !important;
         border-radius: 12px;
-        border-left: 4px solid #00f5ff;
-        margin: 1rem 0;
+        padding: 1.5rem !important;
+        border: 0.5px solid rgba(255, 255, 255, 0.1);
+        font-family: 'SF Mono', Monaco, monospace !important;
+        font-size: 0.875rem;
+        line-height: 1.6;
+        overflow-x: auto;
     }
     
-    .progress-bar {
-        background: rgba(255, 255, 255, 0.1);
-        border-radius: 10px;
-        height: 30px;
-        margin: 1rem 0;
-        overflow: hidden;
+    /* Grid de features estilo Apple.com */
+    .feature-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.5rem;
+        margin: 2rem 0;
     }
     
-    .progress-fill {
-        background: linear-gradient(90deg, #00f5ff, #00ff87);
-        height: 100%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #000;
+    .feature-item {
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 16px;
+        padding: 2rem;
+        text-align: center;
+        border: 0.5px solid rgba(255, 255, 255, 0.1);
+        transition: all 0.3s ease;
+    }
+    
+    .feature-item:hover {
+        background: rgba(255, 255, 255, 0.05);
+        transform: translateY(-8px);
+    }
+    
+    .feature-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        display: block;
+    }
+    
+    .feature-name {
+        font-size: 1.25rem;
         font-weight: 600;
-        transition: width 0.3s ease;
+        color: #f5f5f7;
+        margin-bottom: 0.5rem;
+    }
+    
+    .feature-desc {
+        font-size: 0.9375rem;
+        color: #86868b;
+        line-height: 1.5;
+    }
+    
+    /* Progress bar estilo iOS */
+    .ios-progress {
+        background: rgba(255, 255, 255, 0.1);
+        height: 6px;
+        border-radius: 3px;
+        overflow: hidden;
+        margin: 1rem 0;
+    }
+    
+    .ios-progress-fill {
+        background: linear-gradient(90deg, #0071e3, #00a2ff);
+        height: 100%;
+        border-radius: 3px;
+        transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    /* Tabla estilo Apple */
+    .dataframe {
+        border: none !important;
+        border-radius: 12px !important;
+        overflow: hidden !important;
+    }
+    
+    .dataframe thead tr {
+        background: rgba(255, 255, 255, 0.05) !important;
+    }
+    
+    .dataframe tbody tr {
+        border-bottom: 0.5px solid rgba(255, 255, 255, 0.05) !important;
+    }
+    
+    .dataframe th {
+        color: #86868b !important;
+        font-weight: 500 !important;
+        font-size: 0.875rem !important;
+        padding: 1rem !important;
+    }
+    
+    .dataframe td {
+        color: #f5f5f7 !important;
+        padding: 1rem !important;
+        font-size: 1rem !important;
+    }
+    
+    /* Footer estilo Apple */
+    .apple-footer {
+        text-align: center;
+        padding: 3rem 0;
+        border-top: 0.5px solid rgba(255, 255, 255, 0.1);
+        margin-top: 5rem;
+        color: #86868b;
+    }
+    
+    .apple-footer a {
+        color: #0071e3;
+        text-decoration: none;
+        transition: color 0.2s ease;
+    }
+    
+    .apple-footer a:hover {
+        color: #0077ed;
+    }
+    
+    /* Animaciones suaves */
+    * {
+        transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+        .hero-title {
+            font-size: 3rem;
+        }
+        .hero-subtitle {
+            font-size: 1.25rem;
+        }
+        .section-title {
+            font-size: 2.5rem;
+        }
+        .content-section {
+            padding: 3rem 5%;
+        }
     }
 </style>
 """, unsafe_allow_html=True)
 
-# Header principal
-st.markdown('<div class="main-header">🎓 Predicción de Puntajes ICFES</div>', unsafe_allow_html=True)
-st.markdown('''
-<div class="sub-header">
-    Proyecto de Machine Learning con enfoque en MLOps<br>
-    Predicción del puntaje global ICFES mediante Gradient Boosting
+# Hero Section
+st.markdown("""
+<div class="hero-section">
+    <div class="hero-title">Proyecto de Machine Learning con enfoque en MLOps</div>
+    <div class="hero-subtitle">
+        Predicción del puntaje global ICFES mediante Gradient Boosting
+    </div>
+    <div class="hero-cta">
+        <a href="https://github.com/tu-usuario/proyecto-icfes" target="_blank" class="apple-button">
+            Ver Codigo en GitHub
+
 </div>
-''', unsafe_allow_html=True)
+""", unsafe_allow_html=True)
 
-# Enlaces principales
-st.markdown('''
-<div style="text-align: center; margin: 2rem 0;">
-    <a href="https://github.com/tu-usuario/proyecto-icfes" target="_blank" class="github-button">
-        🔗 Ver Código en GitHub
-    </a>
+
+# Features grid
+st.markdown("""
+<div class="feature-grid">
+    <div class="feature-item">
+        <span class="feature-icon">🧠</span>
+        <div class="feature-name">Gradient Boosting</div>
+        <div class="feature-desc">Algoritmo de aprendizaje ensemble de última generación</div>
+    </div>
+    <div class="feature-item">
+        <span class="feature-icon">📊</span>
+        <div class="feature-name">5 Features Clave</div>
+        <div class="feature-desc">Puntajes académicos optimizados para predicción</div>
+    </div>
+    <div class="feature-item">
+        <span class="feature-icon">⚡</span>
+        <div class="feature-name">API de predicción costruida con fast api</div>
+        <div class="feature-desc">Predicciones instantáneas vía FastAPI</div>
+    </div>
+    <div class="feature-item">
+        <span class="feature-icon">🔄</span>
+        <div class="feature-name">Pipeline de predicción automatizado</div>
+        <div class="feature-desc">Entrenamiento y despliegue continuo</div>
+    </div>
 </div>
-''', unsafe_allow_html=True)
+""", unsafe_allow_html=True)
 
-# Sidebar para navegación
-st.sidebar.title("Componentes")
-section = st.sidebar.radio(
-    "Selecciona lo que quieres ver:",
-    ["📋 Resumen del Proyecto", "🔬 Metodología ML", "⚙️ Implementación MLOps", 
-     "📊 Stack Tecnológico", "📚 Documentación", "🎯 Resultados"]
-)
+col1, col2 = st.columns(2)
 
-# SECCIÓN 1: RESUMEN DEL PROYECTO
-if section == "📋 Resumen del Proyecto":
+with col1:
     st.markdown("""
-    <div class="section-card">
-        <h2>🎯 Objetivo del Proyecto</h2>
-        <p style="font-size: 1.1rem; line-height: 1.8; color: rgba(255,255,255,0.9);">
-        Este proyecto desarrolla un sistema completo de predicción de puntajes ICFES utilizando Machine Learning,
-        con un enfoque especial en <strong>MLOps</strong> para garantizar reproducibilidad, trazabilidad y 
-        automatización del ciclo de vida del modelo.
-        </p>
+    <div class="apple-card">
+        <div class="card-title" style="font-size: 1.5rem;">Features de Entrada</div>
+        <ul class="apple-list">
+            <li>🌍 Puntaje de Inglés</li>
+            <li>✍️ Comunicación Escrita</li>
+            <li>🤝 Competencias Ciudadanas</li>
+            <li>📖 Lectura Crítica</li>
+            <li>🔢 Razonamiento Cuantitativo</li>
+        </ul>
     </div>
     """, unsafe_allow_html=True)
-    
-    # Métricas clave
-    col1, col2, col3, col4 = st.columns(4)
-    
-    with col1:
-        st.markdown("""
-        <div class="metric-box">
-            <div class="metric-value">95.2%</div>
-            <div class="metric-label">Precisión R²</div>
-        </div>
-        """, unsafe_allow_html=True)
-    
-    with col2:
-        st.markdown("""
-        <div class="metric-box">
-            <div class="metric-value">API REST</div>
-            <div class="metric-label">FastApi</div>
-        </div>
-        """, unsafe_allow_html=True)
-    
-    with col3:
-        st.markdown("""
-        <div class="metric-box">
-            <div class="metric-value">5</div>
-            <div class="metric-label">Features</div>
-        </div>
-        """, unsafe_allow_html=True)
-    
-    with col4:
-        st.markdown("""
-        <div class="metric-box">
-            <div class="metric-value">MLflow</div>
-            <div class="metric-label">Tracking</div>
-        </div>
-        """, unsafe_allow_html=True)
-    
-    # Características del dataset
+
+with col2:
     st.markdown("""
-    <div class="section-card">
-        <h2>📊 Dataset y Features</h2>
-        <p style="color: rgba(255,255,255,0.9); margin-bottom: 1.5rem;">
-        Datos extraídos de los resultados Saber ICFES 2019. El modelo utiliza las siguientes características:
-        </p>
-    </div>
-    """, unsafe_allow_html=True)
-    
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        st.markdown("""
-        <div class="section-card">
-            <h3>📝 Features de Entrada</h3>
-            <ul style="line-height: 2; color: rgba(255,255,255,0.85);">
-                <li>🌍 <strong>Puntaje Inglés</strong></li>
-                <li>✍️ <strong>Comunicación Escrita</strong></li>
-                <li>🤝 <strong>Competencias Ciudadanas</strong></li>
-                <li>📖 <strong>Lectura Crítica</strong></li>
-                <li>🔢 <strong>Razonamiento Cuantitativo</strong></li>
-            </ul>
-        </div>
-        """, unsafe_allow_html=True)
-    
-    with col2:
-        st.markdown("""
-        <div class="section-card">
-            <h3>🎯 Variable Objetivo</h3>
-            <div style="padding: 2rem; text-align: center;">
-                <div style="font-size: 2rem; color: #00f5ff; font-weight: 700;">
-                    Puntaje Global ICFES
-                </div>
-                <p style="color: rgba(255,255,255,0.7); margin-top: 1rem;">
-                    Predicción del puntaje final del estudiante
-                </p>
+    <div class="apple-card">
+        <div class="card-title" style="font-size: 1.5rem;">Variable Objetivo</div>
+        <div style="padding: 3rem 0; text-align: center;">
+            <div style="font-size: 2.5rem; font-weight: 600; color: #0071e3; margin-bottom: 0.5rem;">
+                Puntaje Global ICFES
+            </div>
+            <div style="color: #86868b; font-size: 1rem;">
+                Predicción del rendimiento académico total
             </div>
         </div>
-        """, unsafe_allow_html=True)
+    </div>
+    """, unsafe_allow_html=True)
 
-# SECCIÓN 2: METODOLOGÍA ML
-elif section == "🔬 Metodología ML":
-    st.markdown("""
-    <div class="section-card">
-        <h2>🤖 Algoritmo: Gradient Boosting Regressor</h2>
-        <p style="font-size: 1.1rem; line-height: 1.8; color: rgba(255,255,255,0.9);">
-        Se seleccionó <strong>GradientBoostingRegressor</strong> por su capacidad para capturar relaciones 
-        no lineales y su excelente desempeño en problemas de regresión con múltiples features correlacionadas.
-        </p>
-    </div>
-    """, unsafe_allow_html=True)
-    
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        st.markdown("""
-        <div class="section-card">
-            <h3>✅ Ventajas del Modelo</h3>
-            <ul style="line-height: 2; color: rgba(255,255,255,0.85);">
-                <li>Alta precisión en predicciones</li>
-                <li>Manejo automático de features correlacionadas</li>
-                <li>Robusto ante outliers</li>
-                <li>Captura interacciones complejas</li>
-                <li>Interpretabilidad mediante feature importance</li>
-            </ul>
-        </div>
-        """, unsafe_allow_html=True)
-    
-    with col2:
-        st.markdown("""
-        <div class="section-card">
-            <h3>⚙️ Hiperparámetros Optimizados</h3>
-            <ul style="line-height: 2; color: rgba(255,255,255,0.85);">
-                <li><strong>n_estimators:</strong> 200</li>
-                <li><strong>learning_rate:</strong> 0.1</li>
-                <li><strong>max_depth:</strong> 5</li>
-                <li><strong>min_samples_split:</strong> 10</li>
-                <li><strong>subsample:</strong> 0.8</li>
-            </ul>
-        </div>
-        """, unsafe_allow_html=True)
-    
-    # Pipeline de procesamiento con tarjetas visuales
-    st.markdown("""
-    <div class="section-card">
-        <h3>🔄 Pipeline de Procesamiento de Datos</h3>
-    </div>
-    """, unsafe_allow_html=True)
-    
-    pipeline_steps = [
-        ("1. Extracción", "Datos ICFES 2019", "📥"),
-        ("2. Limpieza", "Normalización y valores faltantes", "🧹"),
-        ("3. Feature Engineering", "Escalado y transformación", "⚙️"),
-        ("4. Entrenamiento", "Gradient Boosting", "🤖"),
-        ("5. Validación", "Cross-Validation (k=5)", "✅")
-    ]
-    
-    for step, desc, icon in pipeline_steps:
-        st.markdown(f"""
-        <div class="pipeline-step">
-            <div style="display: flex; align-items: center; gap: 1rem;">
-                <div style="font-size: 2rem;">{icon}</div>
-                <div>
-                    <div style="font-size: 1.2rem; font-weight: 700; color: #00f5ff;">{step}</div>
-                    <div style="color: rgba(255,255,255,0.7); margin-top: 0.3rem;">{desc}</div>
-                </div>
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
+st.markdown('</div>', unsafe_allow_html=True)
 
-# SECCIÓN 3: IMPLEMENTACIÓN MLOPS
-elif section == "⚙️ Implementación MLOps":
-    st.markdown("""
-    <div class="section-card">
-        <h2>🔧 Stack de MLOps</h2>
-        <p style="font-size: 1.1rem; line-height: 1.8; color: rgba(255,255,255,0.9);">
-        Implementación completa del ciclo de vida de ML con herramientas modernas de MLOps
-        </p>
-    </div>
-    """, unsafe_allow_html=True)
-    
-    # Componentes MLOps
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        st.markdown("""
-        <div class="section-card">
-            <h3>📊 Experiment Tracking</h3>
-            <div class="feature-badge">MLflow</div>
-            <ul style="line-height: 2; color: rgba(255,255,255,0.85); margin-top: 1rem;">
-                <li>Registro de experimentos y métricas</li>
-                <li>Versionamiento de modelos</li>
-                <li>Comparación de hiperparámetros</li>
-                <li>Almacenamiento en Cloud Storage</li>
-            </ul>
-        </div>
-        """, unsafe_allow_html=True)
-        
-        st.markdown("""
-        <div class="section-card">
-            <h3>🗄️ Data Versioning</h3>
-            <div class="feature-badge">DVC</div>
-            <ul style="line-height: 2; color: rgba(255,255,255,0.85); margin-top: 1rem;">
-                <li>Versionamiento del dataset</li>
-                <li>Trazabilidad de cambios en datos</li>
-                <li>Reproducibilidad garantizada</li>
-                <li>Almacenamiento eficiente</li>
-            </ul>
-        </div>
-        """, unsafe_allow_html=True)
-    
-    with col2:
-        st.markdown("""
-        <div class="section-card">
-            <h3>🔄 Pipeline Automation</h3>
-            <div class="feature-badge">Apache Airflow</div>
-            <ul style="line-height: 2; color: rgba(255,255,255,0.85); margin-top: 1rem;">
-                <li>Automatización de entrenamiento</li>
-                <li>Reentrenamiento programado</li>
-                <li>Monitoreo de pipelines</li>
-                <li>Validación automática</li>
-            </ul>
-        </div>
-        """, unsafe_allow_html=True)
-        
-        st.markdown("""
-        <div class="section-card">
-            <h3>🚀 Model Serving</h3>
-            <div class="feature-badge">FastAPI</div>
-            <ul style="line-height: 2; color: rgba(255,255,255,0.85); margin-top: 1rem;">
-                <li>API REST para predicciones</li>
-                <li>Documentación automática (Swagger)</li>
-                <li>Validación de entrada con Pydantic</li>
-                <li>Despliegue en contenedor Docker</li>
-            </ul>
-        </div>
-        """, unsafe_allow_html=True)
-    
-    # Flujo MLOps con barras de progreso
-    st.markdown("""
-    <div class="section-card">
-        <h3>🔄 Flujo Completo de MLOps</h3>
-    </div>
-    """, unsafe_allow_html=True)
-    
-    mlops_stages = [
-        ("Data Versioning", "DVC", 100, "✅"),
-        ("Experiment Tracking", "MLflow", 100, "✅"),
-        ("Model Training", "Scikit-learn", 100, "✅"),
-        ("Model Registry", "MLflow", 100, "✅"),
-        ("Deployment", "Docker + FastAPI", 100, "✅"),
-        ("Monitoring", "Prometheus", 75, "🔄")
-    ]
-    
-    for stage, tool, progress, status in mlops_stages:
-        st.markdown(f"""
-        <div class="section-card" style="padding: 1rem; margin: 0.5rem 0;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-                <div>
-                    <span style="font-weight: 700; color: #00f5ff;">{stage}</span>
-                    <span style="color: rgba(255,255,255,0.6); margin-left: 0.5rem;">• {tool}</span>
-                </div>
-                <span style="font-size: 1.5rem;">{status}</span>
-            </div>
-            <div class="progress-bar">
-                <div class="progress-fill" style="width: {progress}%;">{progress}%</div>
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
+# SECCIÓN: METODOLOGÍA
+st.markdown('<div class="content-section section-light">', unsafe_allow_html=True)
+st.markdown('<div class="section-title">Metodología de Machine Learning</div>', unsafe_allow_html=True)
+st.markdown('<div class="section-subtitle">GradientBoostingRegressor optimizado para capturar relaciones complejas</div>', unsafe_allow_html=True)
 
-# SECCIÓN 4: STACK TECNOLÓGICO
-elif section == "📊 Stack Tecnológico":
-    # Stack tecnológico
+col1, col2 = st.columns(2)
+
+with col1:
     st.markdown("""
-    <div class="section-card">
-        <h3>💻 Stack Tecnológico</h3>
-        <div class="tech-stack">
-            <div class="tech-item">🐍 Python 3.9+</div>
-            <div class="tech-item">🤖 Scikit-learn</div>
-            <div class="tech-item">📊 Pandas & NumPy</div>
-            <div class="tech-item">📈 MLflow</div>
-            <div class="tech-item">🗄️ DVC</div>
-            <div class="tech-item">⚡ FastAPI</div>
-            <div class="tech-item">🐳 Docker</div>
-            <div class="tech-item">☁️ Cloud Storage</div>
-            <div class="tech-item">🔄 Apache Airflow</div>
-            <div class="tech-item">✅ Pytest</div>
+    <div class="apple-card">
+        <div class="card-title" style="font-size: 1.5rem;">Ventajas</div>
+        <ul class="apple-list">
+            <li>Precisión superior al 95%</li>
+            <li>Manejo automático de correlaciones</li>
+            <li>Robusto ante valores atípicos</li>
+            <li>Captura patrones no lineales</li>
+            <li>Interpretabilidad clara</li>
+        </ul>
+    </div>
+    """, unsafe_allow_html=True)
+
+with col2:
+    st.markdown("""
+    <div class="apple-card">
+        <div class="card-title" style="font-size: 1.5rem;">Hiperparámetros</div>
+        <ul class="apple-list">
+            <li>n_estimators: 200</li>
+            <li>learning_rate: 0.1</li>
+            <li>max_depth: 5</li>
+            <li>min_samples_split: 10</li>
+            <li>subsample: 0.8</li>
+        </ul>
+    </div>
+    """, unsafe_allow_html=True)
+
+
+
+
+
+# SECCIÓN: MLOPS
+st.markdown('<div class="content-section section-dark">', unsafe_allow_html=True)
+st.markdown('<div class="section-title">Arquitectura MLOps</div>', unsafe_allow_html=True)
+st.markdown('<div class="section-subtitle">Stack completo de herramientas para gestión del ciclo de vida del modelo</div>', unsafe_allow_html=True)
+
+st.markdown("""
+<div class="feature-grid">
+    <div class="feature-item">
+        <span class="feature-icon">📊</span>
+        <div class="feature-name">MLflow</div>
+        <div class="feature-desc">Tracking de experimentos y registro de modelos</div>
+        <div style="margin-top: 1rem;">
+            <span class="ios-badge">Tracking</span>
+            <span class="ios-badge">Registry</span>
+        </div>
+    </div>
+    <div class="feature-item">
+        <span class="feature-icon">🗄️</span>
+        <div class="feature-name">DVC</div>
+        <div class="feature-desc">Versionamiento de datos y reproducibilidad</div>
+        <div style="margin-top: 1rem;">
+            <span class="ios-badge">Data Version</span>
+            <span class="ios-badge">Pipeline</span>
+        </div>
+    </div>
+    <div class="feature-item">
+        <span class="feature-icon">🔄</span>
+        <div class="feature-name">Apache Airflow</div>
+        <div class="feature-desc">Orquestación y automatización de pipelines</div>
+        <div style="margin-top: 1rem;">
+            <span class="ios-badge">Automation</span>
+            <span class="ios-badge">Scheduling</span>
+        </div>
+    </div>
+    <div class="feature-item">
+        <span class="feature-icon">🚀</span>
+        <div class="feature-name">FastAPI</div>
+        <div class="feature-desc">API REST de alto rendimiento</div>
+        <div style="margin-top: 1rem;">
+            <span class="ios-badge">API</span>
+            <span class="ios-badge">Docker</span>
+        </div>
+    </div>
+</div>
+""", unsafe_allow_html=True)
+
+st.markdown('</div>', unsafe_allow_html=True)
+
+# SECCIÓN: STACK TÉCNICO
+st.markdown('<div class="content-section section-light">', unsafe_allow_html=True)
+st.markdown('<div class="section-title">Stack Tecnológico</div>', unsafe_allow_html=True)
+st.markdown('<div class="section-subtitle">Construido con las herramientas más modernas del ecosistema ML</div>', unsafe_allow_html=True)
+
+tech_categories = {
+    "Machine Learning": ["Python 3.9+", "Scikit-learn", "Pandas", "NumPy"],
+    "MLOps": ["MLflow", "DVC",],
+    "API & Deployment": ["FastAPI"],
+    "Testing": ["Pytest", "GitHub Actions"]
+}
+
+for category, techs in tech_categories.items():
+    st.markdown(f"""
+    <div class="apple-card">
+        <div style="font-size: 1.25rem; font-weight: 600; color: #f5f5f7; margin-bottom: 1rem;">
+            {category}
+        </div>
+        <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+            {"".join([f'<span class="ios-badge">{tech}</span>' for tech in techs])}
         </div>
     </div>
     """, unsafe_allow_html=True)
-    
+
+st.markdown('</div>', unsafe_allow_html=True)
+# DISTRIBUCION DE 
+st.markdown('<div class="content-section section-dark" id="documentacion">', unsafe_allow_html=True)
+st.markdown('<div class="section-title">Distribución de archivos</div>', unsafe_allow_html=True)
+
+# Cargar imagen con efecto premium
+pipeline_img = load_image("archivos.png")
+if pipeline_img:
+    st.image(pipeline_img, use_container_width=True)
+    st.markdown('</div>', unsafe_allow_html=True)
+
+
+# SECCIÓN: DOCUMENTACIÓN
+st.markdown('<div class="content-section section-dark" id="documentacion">', unsafe_allow_html=True)
+st.markdown('<div class="section-title">Documentación</div>', unsafe_allow_html=True)
+st.markdown('<div class="section-subtitle">Guías completas para instalación, uso y despliegue</div>', unsafe_allow_html=True)
+
+col1, col2 = st.columns(2)
+
+with col1:
     st.markdown("""
-    <div class="section-card">
-        <h3>📁 Estructura del Proyecto</h3>
-        <pre style="background: rgba(0,0,0,0.3); padding: 1.5rem; border-radius: 10px; color: #00ff87; overflow-x: auto;">
-proyecto-icfes/
-│
-├── 📁 .dvc/                    # Configuración de DVC
-│   └── config                 # Versionamiento de datos
-│
-├── 📁 .github/workflows/       # CI/CD Automatizado
-│   └── *.yml                  # GitHub Actions pipelines
-│
-├── 📁 __pycache__/             # Archivos compilados Python
-│
-├── 📁 data/                    # Datasets del proyecto
-│   ├── raw/                   # Datos crudos ICFES 2019
-│   └── processed/             # Datos preprocesados
-│
-├── 📁 data_project/            # Proyecto de datos adicional
-│   └── exploratory/           # Análisis exploratorio
-│
-├── 📁 entorno/                 # Entorno virtual Python
-│   └── venv/                  # Dependencias aisladas
-│
-├── 📁 mlruns/                  # 🔥 MLflow Tracking
-│   ├── experiments/           # Historial de experimentos
-│   ├── models/                # Registro de modelos
-│   └── artifacts/             # Artefactos guardados
-│
-├── 📁 models/                  # Modelos entrenados
-│   ├── gradient_boosting.pkl  # Modelo principal
-│   └── scaler.pkl             # Preprocesador
-│
-├── 📁 tests/                   # Tests unitarios
-│   ├── test_model.py          # Tests del modelo
-│   └── test_api.py            # Tests de la API
-│
-├── 📄 .DS_Store               # Archivo de sistema (macOS)
-├── 📄 .env                     # Variables de entorno
-├── 📄 .gitignore              # Archivos ignorados por Git
-├── 📄 README.md               # 📚 Documentación principal
-├── 📄 api_service.log         # Logs de la API
-├── 📄 config.yaml             # Configuración del proyecto
-├── 📄 main.py                 # 🚀 Aplicación FastAPI
-├── 📄 pytest.ini              # Configuración de tests
-└── 📄 requirements.txt        # Dependencias Python
+    <div class="apple-card">
+        <div class="card-title" style="font-size: 1.5rem;">Instalación Rápida</div>
+        <pre style="color: #0071e3;">
+# Clonar repositorio
+git clone https://github.com/tu-usuario/proyecto-icfes.git
+cd proyecto-icfes
+
+# Crear entorno virtual
+python -m venv venv
+source venv/bin/activate
+
+# Instalar dependencias
+pip install -r requirements.txt
+
+# Descargar datos
+dvc pull
+
+# Entrenar modelo
+python src/models/train.py
+
+# Iniciar API
+uvicorn src.api.main:app --reload
         </pre>
     </div>
     """, unsafe_allow_html=True)
 
-# SECCIÓN 5: DOCUMENTACIÓN
-elif section == "📚 Documentación":
+with col2:
     st.markdown("""
-    <div class="section-card">
-        <h2>📖 Documentación Completa</h2>
-    </div>
-    """, unsafe_allow_html=True)
-    
-    # Tabs para diferentes tipos de documentación
-    doc_tab = st.radio(
-        "Selecciona el tipo de documentación:",
-        ["🚀 Quick Start", "🔌 Uso de la API", "🔧 Configuración MLflow", "🐳 Docker Deployment"],
-        horizontal=True
-    )
-    
-    if doc_tab == "🚀 Quick Start":
-        st.markdown("""
-        <div class="section-card">
-            <h3>Instalación y Configuración</h3>
-            <pre style="background: rgba(0,0,0,0.3); padding: 1.5rem; border-radius: 10px; color: #00ff87;">
-# 1. Clonar el repositorio
-git clone https://github.com/tu-usuario/proyecto-icfes.git
-cd proyecto-icfes
-
-# 2. Crear entorno virtual
-python -m venv venv
-source venv/bin/activate  # En Windows: venv\\Scripts\\activate
-
-# 3. Instalar dependencias
-pip install -r requirements.txt
-
-# 4. Configurar DVC
-dvc pull  # Descargar datos versionados
-
-# 5. Entrenar el modelo
-python src/models/train.py
-
-# 6. Iniciar la API
-uvicorn src.api.main:app --reload
-            </pre>
-        </div>
-        """, unsafe_allow_html=True)
-    
-    elif doc_tab == "🔌 Uso de la API":
-        st.markdown("""
-        <div class="section-card">
-            <h3>Endpoints de la API</h3>
-            <pre style="background: rgba(0,0,0,0.3); padding: 1.5rem; border-radius: 10px; color: #00ff87;">
-# POST /predict - Realizar predicción
+    <div class="apple-card">
+        <div class="card-title" style="font-size: 1.5rem;">Uso de la API</div>
+        <pre style="color: #0071e3;">
+# Realizar predicción
 curl -X POST "http://localhost:8000/predict" \\
   -H "Content-Type: application/json" \\
   -d '{
@@ -598,261 +653,96 @@ curl -X POST "http://localhost:8000/predict" \\
 # Respuesta
 {
   "puntaje_global": 285.4,
-  "modelo_version": "v1.2.0",
-  "timestamp": "2025-11-06T10:30:00Z"
+  "modelo_version": "v1.2.0"
 }
-
-# GET /health - Estado del servicio
-curl http://localhost:8000/health
-
-# GET /docs - Documentación Swagger
-http://localhost:8000/docs
-            </pre>
-        </div>
-        """, unsafe_allow_html=True)
-    
-    elif doc_tab == "🔧 Configuración MLflow":
-        st.markdown("""
-        <div class="section-card">
-            <h3>Configuración de MLflow</h3>
-            <pre style="background: rgba(0,0,0,0.3); padding: 1.5rem; border-radius: 10px; color: #00ff87;">
-# Iniciar MLflow UI
-mlflow ui --backend-store-uri sqlite:///mlflow.db
-
-# En el código de entrenamiento
-import mlflow
-
-mlflow.set_tracking_uri("sqlite:///mlflow.db")
-mlflow.set_experiment("icfes_prediction")
-
-with mlflow.start_run():
-    # Registrar parámetros
-    mlflow.log_param("n_estimators", 200)
-    mlflow.log_param("learning_rate", 0.1)
-    
-    # Registrar métricas
-    mlflow.log_metric("r2_score", 0.952)
-    mlflow.log_metric("mse", 12.3)
-    
-    # Guardar modelo
-    mlflow.sklearn.log_model(model, "model")
-            </pre>
-        </div>
-        """, unsafe_allow_html=True)
-    
-    else:  # Docker Deployment
-        st.markdown("""
-        <div class="section-card">
-            <h3>Despliegue con Docker</h3>
-            <pre style="background: rgba(0,0,0,0.3); padding: 1.5rem; border-radius: 10px; color: #00ff87;">
-# Dockerfile
-FROM python:3.9-slim
-
-WORKDIR /app
-
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-
-COPY . .
-
-EXPOSE 8000
-
-CMD ["uvicorn", "src.api.main:app", "--host", "0.0.0.0", "--port", "8000"]
-
-# Construir imagen
-docker build -t icfes-predictor:latest .
-
-# Ejecutar contenedor
-docker run -d -p 8000:8000 icfes-predictor:latest
-
-# Docker Compose
-docker-compose up -d
-            </pre>
-        </div>
-        """, unsafe_allow_html=True)
-
-# SECCIÓN 6: RESULTADOS
-else:  # Resultados
-    st.markdown("""
-    <div class="section-card">
-        <h2>🎯 Resultados y Métricas del Modelo</h2>
+        </pre>
     </div>
     """, unsafe_allow_html=True)
-    
-    # Métricas principales
-    col1, col2, col3 = st.columns(3)
-    
-    with col1:
-        st.markdown("""
-        <div class="metric-box">
-            <div class="metric-value">0.952</div>
-            <div class="metric-label">R² Score</div>
+
+st.markdown('</div>', unsafe_allow_html=True)
+
+# SECCIÓN: RESULTADOS
+st.markdown('<div class="content-section section-light">', unsafe_allow_html=True)
+st.markdown('<div class="section-title">Resultados del Modelo</div>', unsafe_allow_html=True)
+st.markdown('<div class="section-subtitle">Métricas de rendimiento y comparación con otros algoritmos</div>', unsafe_allow_html=True)
+
+# Importancia de features
+st.markdown("""
+<div class="apple-card">
+    <div class="card-title" style="font-size: 1.5rem;">Importancia de Features</div>
+</div>
+""", unsafe_allow_html=True)
+
+features = [
+    ("Razonamiento Cuantitativo", 32),
+    ("Lectura Crítica", 28),
+    ("Inglés", 22),
+    ("Competencias Ciudadanas", 11),
+    ("Comunicación Escrita", 7)
+]
+
+for feature, importance in features:
+    st.markdown(f"""
+    <div class="apple-card" style="padding: 1.25rem; margin: 0.5rem 0;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem;">
+            <span style="font-weight: 500; color: #f5f5f7;">{feature}</span>
+            <span style="color: #0071e3; font-weight: 600;">{importance}%</span>
         </div>
-        """, unsafe_allow_html=True)
-    
-    with col2:
-        st.markdown("""
-        <div class="metric-box">
-            <div class="metric-value">12.3</div>
-            <div class="metric-label">RMSE</div>
+        <div class="ios-progress">
+            <div class="ios-progress-fill" style="width: {importance}%;"></div>
         </div>
-        """, unsafe_allow_html=True)
-    
-    with col3:
-        st.markdown("""
-        <div class="metric-box">
-            <div class="metric-value">8.5</div>
-            <div class="metric-label">MAE</div>
-        </div>
-        """, unsafe_allow_html=True)
-    
-    # Importancia de features
-    st.markdown("""
-    <div class="section-card">
-        <h3>📊 Importancia de Features en el Modelo</h3>
     </div>
     """, unsafe_allow_html=True)
-    
-    features_data = {
-        'Feature': ['Razonamiento Cuantitativo', 'Lectura Crítica', 'Inglés', 
-                   'Competencias Ciudadanas', 'Comunicación Escrita'],
-        'Importancia': [0.32, 0.28, 0.22, 0.11, 0.07]
-    }
-    
-    for feature, importance in zip(features_data['Feature'], features_data['Importancia']):
-        percentage = int(importance * 100)
-        st.markdown(f"""
-        <div class="section-card" style="padding: 1rem; margin: 0.5rem 0;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-                <span style="font-weight: 600; color: rgba(255,255,255,0.9);">{feature}</span>
-                <span style="color: #00f5ff; font-weight: 700;">{percentage}%</span>
-            </div>
-            <div class="progress-bar">
-                <div class="progress-fill" style="width: {percentage}%;"></div>
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
-    
-    # Comparación de modelos
+
+# Comparación de modelos
+st.markdown("""
+<div class="apple-card" style="margin-top: 3rem;">
+    <div class="card-title" style="font-size: 1.5rem;">Comparación de Modelos</div>
+</div>
+""", unsafe_allow_html=True)
+
+models_data = {
+    'Modelo': ['Gradient Boosting', 'Random Forest', 'XGBoost', 'Linear Regression'],
+    'R² Score': [0.952, 0.938, 0.945, 0.812],
+    'RMSE': [12.3, 14.2, 13.1, 22.5],
+    'Tiempo (s)': [2.3, 1.8, 2.1, 0.5]
+}
+df_models = pd.DataFrame(models_data)
+
+st.dataframe(
+    df_models.style.highlight_max(subset=['R² Score'], color='rgba(0, 113, 227, 0.2)')
+                  .highlight_min(subset=['RMSE', 'Tiempo (s)'], color='rgba(0, 113, 227, 0.2)')
+                  .format({'R² Score': '{:.3f}', 'RMSE': '{:.1f}', 'Tiempo (s)': '{:.1f}'}),
+    use_container_width=True
+)
+
+col1, col2 = st.columns(2)
+
+with col1:
     st.markdown("""
-    <div class="section-card">
-        <h3>📊 Comparación de Modelos Evaluados</h3>
-    </div>
-    """, unsafe_allow_html=True)
-    
-    models_comparison = {
-        'Modelo': ['Gradient Boosting', 'Random Forest', 'XGBoost', 'Linear Regression'],
-        'R² Score': [0.952, 0.938, 0.945, 0.812],
-        'RMSE': [12.3, 14.2, 13.1, 22.5],
-        'Tiempo (s)': [2.3, 1.8, 2.1, 0.5]
-    }
-    df_comp = pd.DataFrame(models_comparison)
-    
-    # Mostrar tabla con estilos
-    st.dataframe(
-        df_comp.style.highlight_max(subset=['R² Score'], color='rgba(0, 255, 135, 0.3)')
-                     .highlight_min(subset=['RMSE', 'Tiempo (s)'], color='rgba(0, 255, 135, 0.3)')
-                     .format({'R² Score': '{:.3f}', 'RMSE': '{:.1f}', 'Tiempo (s)': '{:.1f}'}),
-        use_container_width=True
-    )
-    
-    # Representación visual de comparación de modelos
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        st.markdown("""
-        <div class="section-card">
-            <h4>🏆 Mejor Precisión (R² Score)</h4>
-        </div>
-        """, unsafe_allow_html=True)
-        
-        for i, (model, score) in enumerate(zip(models_comparison['Modelo'], models_comparison['R² Score'])):
-            rank = i + 1
-            medal = "🥇" if rank == 1 else "🥈" if rank == 2 else "🥉" if rank == 3 else "🔹"
-            score_pct = int(score * 100)
-            
-            st.markdown(f"""
-            <div class="section-card" style="padding: 0.8rem; margin: 0.3rem 0;">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <div style="display: flex; align-items: center; gap: 0.5rem;">
-                        <span style="font-size: 1.5rem;">{medal}</span>
-                        <span style="font-weight: 600;">{model}</span>
-                    </div>
-                    <span style="color: #00f5ff; font-weight: 700;">{score:.3f}</span>
-                </div>
-                <div class="progress-bar" style="height: 8px; margin-top: 0.5rem;">
-                    <div class="progress-fill" style="width: {score_pct}%;"></div>
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
-    
-    with col2:
-        st.markdown("""
-        <div class="section-card">
-            <h4>⚡ Menor Error (RMSE)</h4>
-        </div>
-        """, unsafe_allow_html=True)
-        
-        # Ordenar por RMSE ascendente
-        sorted_indices = sorted(range(len(models_comparison['RMSE'])), 
-                              key=lambda i: models_comparison['RMSE'][i])
-        
-        for rank, i in enumerate(sorted_indices, 1):
-            model = models_comparison['Modelo'][i]
-            rmse = models_comparison['RMSE'][i]
-            medal = "🥇" if rank == 1 else "🥈" if rank == 2 else "🥉" if rank == 3 else "🔹"
-            
-            # Invertir para visualización (menor es mejor)
-            max_rmse = max(models_comparison['RMSE'])
-            error_pct = int((1 - rmse/max_rmse) * 100)
-            
-            st.markdown(f"""
-            <div class="section-card" style="padding: 0.8rem; margin: 0.3rem 0;">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <div style="display: flex; align-items: center; gap: 0.5rem;">
-                        <span style="font-size: 1.5rem;">{medal}</span>
-                        <span style="font-weight: 600;">{model}</span>
-                    </div>
-                    <span style="color: #00f5ff; font-weight: 700;">{rmse:.1f}</span>
-                </div>
-                <div class="progress-bar" style="height: 8px; margin-top: 0.5rem;">
-                    <div class="progress-fill" style="width: {error_pct}%;"></div>
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
-    
-    # Próximos pasos
-    st.markdown("""
-    <div class="section-card">
-        <h3>🚀 Próximos Pasos y Mejoras</h3>
-        <ul style="line-height: 2; color: rgba(255,255,255,0.85);">
-            <li>✅ Implementar monitoring de drift de datos</li>
-            <li>✅ Agregar reentrenamiento automático mensual</li>
-            <li>🔄 A/B testing de nuevas versiones del modelo</li>
-            <li>🔄 Integración con sistema de alertas</li>
-            <li>📊 Dashboard de métricas en tiempo real</li>
-            <li>🔐 Autenticación JWT en la API</li>
+    <div class="apple-card" style="margin-top: 2rem;">
+        <div class="card-title" style="font-size: 1.25rem;">Métricas Principales</div>
+        <ul class="apple-list">
+            <li>R² Score: 0.952</li>
+            <li>RMSE: 12.3</li>
+            <li>MAE: 8.5</li>
+            <li>Tiempo de entrenamiento: 2.3s</li>
         </ul>
     </div>
     """, unsafe_allow_html=True)
 
-# Footer
-st.markdown("---")
-st.markdown("""
-<div style='text-align: center; color: rgba(255,255,255,0.6); padding: 2rem 0;'>
-    <p style='font-size: 1.2rem; margin-bottom: 1rem;'>
-        <strong>🎓 Proyecto ICFES - Machine Learning con MLOps</strong>
-    </p>
-    <p style='margin: 0.5rem 0;'>
-        Desarrollado por: Egar Yovany Samaca Acuña, Científico de datos Junior
-    </p>
-    <p style='margin: 0.5rem 0;'>
-        📧 Contacto: egsamaca56@gmail.com | 
-        💼 <a href="https://www.linkedin.com/in/edgar-yovany-samaca-acu%C3%B1a-a17452210/" target="_blank" style="color: #00f5ff;">LinkedIn</a> | 
-        🐙 <a href="https://github.com/giovany-desing" target="_blank" style="color: #00f5ff;">GitHub</a>
-    </p>
-    <p style='margin-top: 1.5rem; font-size: 0.9rem;'>
-        © 2025 - Todos los derechos reservados
-    </p>
-</div>
-""", unsafe_allow_html=True)
+with col2:
+    st.markdown("""
+    <div class="apple-card" style="margin-top: 2rem;">
+        <div class="card-title" style="font-size: 1.25rem;">Próximos Pasos</div>
+        <ul class="apple-list">
+            <li>Monitoring de drift de datos</li>
+            <li>A/B testing de modelos</li>
+            <li>Dashboard en tiempo real</li>
+            <li>Autenticación JWT en API</li>
+        </ul>
+    </div>
+    """, unsafe_allow_html=True)
+
+st.markdown('</div>', unsafe_allow_html=True)
+
