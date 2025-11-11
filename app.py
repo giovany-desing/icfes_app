@@ -4,6 +4,8 @@ import pandas as pd
 import warnings
 from pathlib import Path
 from PIL import Image
+import requests
+import json
 warnings.filterwarnings('ignore')
 
 
@@ -379,6 +381,52 @@ st.markdown("""
         color: #0077ed;
     }
     
+    /* Inputs estilo Apple */
+    .stNumberInput > div > div > input {
+        background: rgba(255, 255, 255, 0.05) !important;
+        border: 0.5px solid rgba(255, 255, 255, 0.2) !important;
+        border-radius: 12px !important;
+        color: #f5f5f7 !important;
+        font-size: 1.125rem !important;
+        padding: 0.75rem 1rem !important;
+        transition: all 0.3s ease !important;
+    }
+    
+    .stNumberInput > div > div > input:focus {
+        border-color: #0071e3 !important;
+        box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.2) !important;
+    }
+    
+    .stNumberInput label {
+        color: #f5f5f7 !important;
+        font-weight: 500 !important;
+        font-size: 1rem !important;
+        margin-bottom: 0.5rem !important;
+    }
+    
+    /* Botón de Streamlit estilo Apple */
+    .stButton > button {
+        background: linear-gradient(135deg, #0071e3, #0077ed) !important;
+        color: white !important;
+        padding: 1rem 3rem !important;
+        border-radius: 980px !important;
+        border: none !important;
+        font-weight: 500 !important;
+        font-size: 1.125rem !important;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        box-shadow: 0 4px 20px rgba(0, 113, 227, 0.3) !important;
+        width: 100% !important;
+    }
+    
+    .stButton > button:hover {
+        transform: translateY(-2px) !important;
+        box-shadow: 0 6px 30px rgba(0, 113, 227, 0.5) !important;
+    }
+    
+    .stButton > button:active {
+        transform: translateY(0) !important;
+    }
+    
     /* Animaciones suaves */
     * {
         transition: background-color 0.3s ease, border-color 0.3s ease;
@@ -411,115 +459,22 @@ st.markdown("""
     </div>
     <div class="hero-cta">
         <a href="https://github.com/giovany-desing/proyecto_icfes" target="_blank" class="apple-button">
-            Ver Codigo en GitHub
-
+            Ver Código en GitHub
+        </a>
+    </div>
 </div>
 """, unsafe_allow_html=True)
 
-
-# Features grid
 st.markdown("""
-<div class="feature-grid">
-    <div class="feature-item">
-        <span class="feature-icon">🧠</span>
-        <div class="feature-name">Gradient Boosting</div>
-        <div class="feature-desc">Algoritmo de aprendizaje ensemble de última generación</div>
-    </div>
-    <div class="feature-item">
-        <span class="feature-icon">📊</span>
-        <div class="feature-name">5 Features Clave</div>
-        <div class="feature-desc">Puntajes académicos optimizados para predicción</div>
-    </div>
-    <div class="feature-item">
-        <span class="feature-icon">⚡</span>
-        <div class="feature-name">API de predicción costruida con fast api</div>
-        <div class="feature-desc">Predicciones instantáneas vía FastAPI</div>
-    </div>
-    <div class="feature-item">
-        <span class="feature-icon">🔄</span>
-        <div class="feature-name">Pipeline de predicción automatizado</div>
-        <div class="feature-desc">Entrenamiento y despliegue continuo</div>
+<div class="hero-section">
+     <div class="hero-subtitle">
+        Mi enfoque para el desarrollo de Machine Learning va más allá del modelo, diseño y construyo sistemas de MLOps completos, robustos y listos para producción.
+        Entiendo que la reproducibilidad, la calidad del software y la automatización son la base del éxito. Por ello, implemento arquitecturas modulares que separan la lógica, la configuración y los datos. Mi flujo de trabajo incluye:
     </div>
 </div>
 """, unsafe_allow_html=True)
-
-col1, col2 = st.columns(2)
-
-with col1:
-    st.markdown("""
-    <div class="apple-card">
-        <div class="card-title" style="font-size: 1.5rem;">Features de Entrada</div>
-        <ul class="apple-list">
-            <li>🌍 Puntaje de Inglés</li>
-            <li>✍️ Comunicación Escrita</li>
-            <li>🤝 Competencias Ciudadanas</li>
-            <li>📖 Lectura Crítica</li>
-            <li>🔢 Razonamiento Cuantitativo</li>
-        </ul>
-    </div>
-    """, unsafe_allow_html=True)
-
-with col2:
-    st.markdown("""
-    <div class="apple-card">
-        <div class="card-title" style="font-size: 1.5rem;">Variable Objetivo</div>
-        <div style="padding: 3rem 0; text-align: center;">
-            <div style="font-size: 2.5rem; font-weight: 600; color: #0071e3; margin-bottom: 0.5rem;">
-                Puntaje Global ICFES
-            </div>
-            <div style="color: #86868b; font-size: 1rem;">
-                Predicción del rendimiento académico total
-            </div>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-
-st.markdown('</div>', unsafe_allow_html=True)
-
-# SECCIÓN: METODOLOGÍA
-st.markdown('<div class="content-section section-light">', unsafe_allow_html=True)
-st.markdown('<div class="section-title">Metodología de Machine Learning</div>', unsafe_allow_html=True)
-st.markdown('<div class="section-subtitle">GradientBoostingRegressor optimizado para capturar relaciones complejas</div>', unsafe_allow_html=True)
-
-col1, col2 = st.columns(2)
-
-with col1:
-    st.markdown("""
-    <div class="apple-card">
-        <div class="card-title" style="font-size: 1.5rem;">Ventajas</div>
-        <ul class="apple-list">
-            <li>Precisión superior al 95%</li>
-            <li>Manejo automático de correlaciones</li>
-            <li>Robusto ante valores atípicos</li>
-            <li>Captura patrones no lineales</li>
-            <li>Interpretabilidad clara</li>
-        </ul>
-    </div>
-    """, unsafe_allow_html=True)
-
-with col2:
-    st.markdown("""
-    <div class="apple-card">
-        <div class="card-title" style="font-size: 1.5rem;">Hiperparámetros</div>
-        <ul class="apple-list">
-            <li>n_estimators: 200</li>
-            <li>learning_rate: 0.1</li>
-            <li>max_depth: 5</li>
-            <li>min_samples_split: 10</li>
-            <li>subsample: 0.8</li>
-        </ul>
-    </div>
-    """, unsafe_allow_html=True)
-
-
-
-
 
 # SECCIÓN: MLOPS
-st.markdown('<div class="content-section section-dark">', unsafe_allow_html=True)
-st.markdown('<div class="section-title">Arquitectura MLOps</div>', unsafe_allow_html=True)
-st.markdown('<div class="section-subtitle">Stack completo de herramientas para gestión del ciclo de vida del modelo</div>', unsafe_allow_html=True)
-
 st.markdown("""
 <div class="feature-grid">
     <div class="feature-item">
@@ -561,110 +516,243 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-st.markdown('</div>', unsafe_allow_html=True)
+# SECCIÓN DE PREDICCIÓN - API INTERACTIVA
+st.markdown('<div class="content-section section-dark">', unsafe_allow_html=True)
+st.markdown('<div class="section-title">Prueba el Modelo en Vivo</div>', unsafe_allow_html=True)
+st.markdown('<div class="section-subtitle">Ingresa los puntajes de cada área y obtén la predicción del puntaje global ICFES</div>', unsafe_allow_html=True)
 
-# SECCIÓN: STACK TÉCNICO
-st.markdown('<div class="content-section section-light">', unsafe_allow_html=True)
-st.markdown('<div class="section-title">Stack Tecnológico</div>', unsafe_allow_html=True)
-st.markdown('<div class="section-subtitle">Construido con las herramientas más modernas del ecosistema ML</div>', unsafe_allow_html=True)
+# Inicializar session state para el resultado
+if 'prediction_result' not in st.session_state:
+    st.session_state.prediction_result = None
+if 'prediction_error' not in st.session_state:
+    st.session_state.prediction_error = None
+if 'api_response_raw' not in st.session_state:
+    st.session_state.api_response_raw = None
 
-tech_categories = {
-    "Machine Learning": ["Python 3.9+", "Scikit-learn", "Pandas", "NumPy"],
-    "MLOps": ["MLflow", "DVC",],
-    "API & Deployment": ["FastAPI"],
-    "Testing": ["Pytest", "GitHub Actions"]
-}
-
-for category, techs in tech_categories.items():
-    st.markdown(f"""
-    <div class="apple-card">
-        <div style="font-size: 1.25rem; font-weight: 600; color: #f5f5f7; margin-bottom: 1rem;">
-            {category}
-        </div>
-        <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
-            {"".join([f'<span class="ios-badge">{tech}</span>' for tech in techs])}
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-
-st.markdown('</div>', unsafe_allow_html=True)
-# DISTRIBUCION DE 
-st.markdown('<div class="content-section section-dark" id="documentacion">', unsafe_allow_html=True)
-st.markdown('<div class="section-title">Distribución de archivos</div>', unsafe_allow_html=True)
-
-# Cargar imagen con efecto premium
-pipeline_img = load_image("archivos.png")
-if pipeline_img:
-    st.image(pipeline_img, use_container_width=True)
-    st.markdown('</div>', unsafe_allow_html=True)
-
-
-# SECCIÓN: DOCUMENTACIÓN
-st.markdown('<div class="content-section section-dark" id="documentacion">', unsafe_allow_html=True)
-st.markdown('<div class="section-title">Documentación</div>', unsafe_allow_html=True)
-st.markdown('<div class="section-subtitle">Guías completas para instalación, uso y despliegue</div>', unsafe_allow_html=True)
-
-col1, col2 = st.columns(2)
+col1, col2 = st.columns([1, 1])
 
 with col1:
     st.markdown("""
     <div class="apple-card">
-        <div class="card-title" style="font-size: 1.5rem;">Instalación Rápida</div>
-        <pre style="color: #0071e3;">
-# Clonar repositorio
-git clone https://github.com/tu-usuario/proyecto-icfes.git
-cd proyecto-icfes
-
-# Crear entorno virtual
-python -m venv venv
-source venv/bin/activate
-
-# Instalar dependencias
-pip install -r requirements.txt
-
-# Descargar datos
-dvc pull
-
-# Entrenar modelo
-python src/models/train.py
-
-# Iniciar API
-uvicorn src.api.main:app --reload
-        </pre>
+        <div class="card-title" style="font-size: 1.5rem;">Features de Entrada</div>
+        <div style="color: #86868b; font-size: 0.9375rem; margin-bottom: 1.5rem;">
+            Ingresa los puntajes de cada área evaluada
+        </div>
     </div>
     """, unsafe_allow_html=True)
+    
+    # Inputs con valores por defecto - usando los nombres correctos para la API
+    ingles = st.number_input(
+        "🌍 Puntaje de Inglés",
+        min_value=0,
+        max_value=100,
+        value=65,
+        step=1,
+        help="Ingresa el puntaje obtenido en Inglés (0-100)",
+        key="ingles_input"
+    )
+    
+    comunicacion = st.number_input(
+        "✍️ Comunicación Escrita",
+        min_value=0,
+        max_value=100,
+        value=70,
+        step=1,
+        help="Ingresa el puntaje obtenido en Comunicación Escrita (0-100)",
+        key="comunicacion_input"
+    )
+    
+    competencias = st.number_input(
+        "🤝 Competencias Ciudadanas",
+        min_value=0,
+        max_value=100,
+        value=68,
+        step=1,
+        help="Ingresa el puntaje obtenido en Competencias Ciudadanas (0-100)",
+        key="competencias_input"
+    )
+    
+    lectura = st.number_input(
+        "📖 Lectura Crítica",
+        min_value=0,
+        max_value=100,
+        value=72,
+        step=1,
+        help="Ingresa el puntaje obtenido en Lectura Crítica (0-100)",
+        key="lectura_input"
+    )
+    
+    razonamiento = st.number_input(
+        "🔢 Razonamiento Cuantitativo",
+        min_value=0,
+        max_value=100,
+        value=75,
+        step=1,
+        help="Ingresa el puntaje obtenido en Razonamiento Cuantitativo (0-100)",
+        key="razonamiento_input"
+    )
 
 with col2:
     st.markdown("""
     <div class="apple-card">
-        <div class="card-title" style="font-size: 1.5rem;">Uso de la API</div>
-        <pre style="color: #0071e3;">
-# Realizar predicción
-curl -X POST "http://localhost:8000/predict" \\
-  -H "Content-Type: application/json" \\
-  -d '{
-    "ingles": 65,
-    "comunicacion_escrita": 70,
-    "competencias_ciudadanas": 68,
-    "lectura_critica": 72,
-    "razonamiento_cuantitativo": 75
-  }'
-
-# Respuesta
-{
-  "puntaje_global": 285.4,
-  "modelo_version": "v1.2.0"
-}
-        </pre>
+        <div class="card-title" style="font-size: 1.5rem;">Variable Objetivo</div>
+        <div style="color: #86868b; font-size: 0.9375rem; margin-bottom: 1.5rem;">
+            Predicción del rendimiento académico total
+        </div>
     </div>
     """, unsafe_allow_html=True)
+    
+    # CONTENIDO DINÁMICO - TODOS LOS ESTADOS EN EL MISMO CUADRO
+    if st.session_state.prediction_result:
+        # Buscar el valor de predicted_score específicamente
+        prediction_value = None
+        
+        # Buscar en diferentes claves posibles
+        prediction_keys = ['predicted_score', 'r_Copy to clipboard', 'puntaje_global', 'PUNT_GLOBAL', 'prediction', 'score', 'result']
+        
+        for key in prediction_keys:
+            if key in st.session_state.prediction_result:
+                prediction_value = st.session_state.prediction_result[key]
+                break
+        
+        if prediction_value is not None:
+            # MOSTRAR SOLO EL NÚMERO DE LA PREDICCIÓN EN EL CUADRO PRINCIPAL
+            st.markdown(f"""
+            <div class="apple-card" style="background: linear-gradient(135deg, rgba(0, 113, 227, 0.15) 0%, rgba(0, 113, 227, 0.05) 100%); border-color: rgba(0, 113, 227, 0.3);">
+                <div style="text-align: center; padding: 2rem 0;">
+                    <div style="font-size: 4rem; font-weight: 700; color: #0071e3; margin-bottom: 1rem;">
+                        {float(prediction_value):.0f}
+                    </div>
+                    <div style="font-size: 1.25rem; color: #f5f5f7; font-weight: 500; margin-bottom: 0.5rem;">
+                        Puntaje Global ICFES
+                    </div>
+                    <div style="font-size: 0.875rem; color: #86868b;">
+                        Predicción generada por el modelo
+                    </div>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+        else:
+            # Si no encontramos el valor de predicción, mostrar mensaje de error
+            st.markdown(f"""
+            <div class="apple-card" style="background: rgba(255, 204, 0, 0.1); border-color: rgba(255, 204, 0, 0.3);">
+                <div style="text-align: center; padding: 2rem;">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">⚠️</div>
+                    <div style="color: #ffcc00; font-size: 1.125rem; font-weight: 500;">
+                        No se pudo obtener la predicción
+                    </div>
+                    <div style="color: #86868b; font-size: 0.875rem; margin-top: 0.5rem;">
+                        La respuesta de la API no contiene el valor de predicción
+                    </div>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+    
+    elif st.session_state.prediction_error:
+        st.markdown(f"""
+        <div class="apple-card" style="background: rgba(255, 59, 48, 0.1); border-color: rgba(255, 59, 48, 0.3);">
+            <div style="text-align: center; padding: 2rem;">
+                <div style="font-size: 3rem; margin-bottom: 1rem;">⚠️</div>
+                <div style="color: #ff3b30; font-size: 1.125rem; font-weight: 500;">
+                    Error en la predicción
+                </div>
+                <div style="color: #86868b; font-size: 0.875rem; margin-top: 0.5rem;">
+                    {st.session_state.prediction_error}
+                </div>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    else:
+        # ESTADO INICIAL - Mismo cuadro que se transforma con el resultado
+        st.markdown("""
+        <div class="apple-card" style="background: rgba(255, 255, 255, 0.02);">
+            <div style="text-align: center; padding: 3rem 1rem;">
+                <div style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.3;">🎯</div>
+                <div style="color: #86868b; font-size: 1rem;">
+                    Ingresa los puntajes y haz clic en<br>"Realizar Predicción"
+                </div>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+
+# Botón de predicción centrado
+st.markdown('<div style="margin: 2rem 0;">', unsafe_allow_html=True)
+
+# Configuración del endpoint - AHORA NO EDITABLE
+st.text_input(
+    "🔗 URL del Endpoint de Predicción",
+    value="https://proyecto-icfes-pv4t.onrender.com/predict/",
+    help="Endpoint configurado para realizar las predicciones",
+    key="api_endpoint",
+    disabled=True  # Esto hace que no se pueda editar
+)
+
+if st.button("🚀 Realizar Predicción", use_container_width=False, key="predict_button"):
+    with st.spinner("Procesando predicción..."):
+        try:
+            # Preparar datos para el endpoint en el formato correcto
+            payload = {
+                "MOD_INGLES_PNAL": float(ingles),
+                "MOD_COMUNI_ESCRITA_PNAL": float(comunicacion),
+                "MOD_COMPETEN_CIUDADA_PNAL": float(competencias),
+                "MOD_LECTURA_CRITICA_PNAL": float(lectura),
+                "MOD_RAZONA_CUANTITATIVO_PNAL": float(razonamiento)
+            }
+            
+            # Realizar petición al endpoint
+            response = requests.post(
+                "https://proyecto-icfes-pv4t.onrender.com/predict/",  # URL fija
+                json=payload,
+                headers={"Content-Type": "application/json"},
+                timeout=30
+            )
+            
+            # Guardar respuesta raw para debugging
+            st.session_state.api_response_raw = f"Status: {response.status_code}\nHeaders: {dict(response.headers)}\nBody: {response.text}"
+            
+            if response.status_code == 200:
+                try:
+                    result = response.json()
+                    st.session_state.prediction_result = result
+                    st.session_state.prediction_error = None
+                    st.success("✅ Predicción realizada exitosamente")
+                except json.JSONDecodeError:
+                    st.session_state.prediction_error = f"La API devolvió una respuesta no JSON: {response.text}"
+                    st.session_state.prediction_result = None
+            else:
+                error_message = f"Error {response.status_code}: {response.text}"
+                st.session_state.prediction_error = error_message
+                st.session_state.prediction_result = None
+            
+            st.rerun()
+                
+        except requests.exceptions.ConnectionError:
+            error_message = "No se pudo conectar con la API. Verifica que el servidor esté ejecutándose."
+            st.session_state.prediction_error = error_message
+            st.session_state.prediction_result = None
+            st.error(f"❌ {error_message}")
+        except requests.exceptions.Timeout:
+            error_message = "La solicitud tardó demasiado tiempo. Intenta nuevamente."
+            st.session_state.prediction_error = error_message
+            st.session_state.prediction_result = None
+            st.error(f"⏱️ {error_message}")
+        except Exception as e:
+            error_message = f"Error inesperado: {str(e)}"
+            st.session_state.prediction_error = error_message
+            st.session_state.prediction_result = None
+            st.error(f"❌ {error_message}")
 
 st.markdown('</div>', unsafe_allow_html=True)
+st.markdown('</div>', unsafe_allow_html=True)
+
+# El resto del código permanece igual...
+# [SECCIONES DE METODOLOGÍA, STACK TÉCNICO, DOCUMENTACIÓN, RESULTADOS, FOOTER]
+# ... (mantener todo el código restante igual)
+
 
 # SECCIÓN: RESULTADOS
 st.markdown('<div class="content-section section-light">', unsafe_allow_html=True)
-st.markdown('<div class="section-title">Resultados del Modelo</div>', unsafe_allow_html=True)
-st.markdown('<div class="section-subtitle">Métricas de rendimiento y comparación con otros algoritmos</div>', unsafe_allow_html=True)
 
 # Importancia de features
 st.markdown("""
@@ -716,31 +804,124 @@ st.dataframe(
     use_container_width=True
 )
 
+
+# SECCIÓN: METODOLOGÍA
+st.markdown('<div class="content-section section-light">', unsafe_allow_html=True)
+st.markdown('<div class="section-title">Metodología de Machine Learning</div>', unsafe_allow_html=True)
+st.markdown('<div class="section-subtitle">GradientBoostingRegressor optimizado para capturar relaciones complejas</div>', unsafe_allow_html=True)
+
 col1, col2 = st.columns(2)
 
 with col1:
     st.markdown("""
-    <div class="apple-card" style="margin-top: 2rem;">
-        <div class="card-title" style="font-size: 1.25rem;">Métricas Principales</div>
+    <div class="apple-card">
+        <div class="card-title" style="font-size: 1.5rem;">Ventajas</div>
         <ul class="apple-list">
-            <li>R² Score: 0.952</li>
-            <li>RMSE: 12.3</li>
-            <li>MAE: 8.5</li>
-            <li>Tiempo de entrenamiento: 2.3s</li>
+            <li>Precisión superior al 95%</li>
+            <li>Manejo automático de correlaciones</li>
+            <li>Robusto ante valores atípicos</li>
+            <li>Captura patrones no lineales</li>
+            <li>Interpretabilidad clara</li>
         </ul>
     </div>
     """, unsafe_allow_html=True)
 
 with col2:
     st.markdown("""
-    <div class="apple-card" style="margin-top: 2rem;">
-        <div class="card-title" style="font-size: 1.25rem;">Próximos Pasos</div>
+    <div class="apple-card">
+        <div class="card-title" style="font-size: 1.5rem;">Hiperparámetros</div>
         <ul class="apple-list">
-            <li>Monitoring de drift de datos</li>
-            <li>A/B testing de modelos</li>
-            <li>Dashboard en tiempo real</li>
-            <li>Autenticación JWT en API</li>
+            <li>n_estimators: 200</li>
+            <li>learning_rate: 0.1</li>
+            <li>max_depth: 5</li>
+            <li>min_samples_split: 10</li>
+            <li>subsample: 0.8</li>
         </ul>
+    </div>
+    """, unsafe_allow_html=True)
+
+
+# SECCIÓN: STACK TÉCNICO
+st.markdown('<div class="content-section section-light">', unsafe_allow_html=True)
+st.markdown('<div class="section-title">Stack Tecnológico</div>', unsafe_allow_html=True)
+st.markdown('<div class="section-subtitle">Construido con las herramientas más modernas del ecosistema ML</div>', unsafe_allow_html=True)
+
+tech_categories = {
+    "Machine Learning": ["Python 3.9+", "Scikit-learn", "Pandas", "NumPy"],
+    "MLOps": ["MLflow", "DVC",],
+    "API & Deployment": ["FastAPI","Docker"],
+    "Testing": ["Pytest", "GitHub Actions"]
+}
+
+for category, techs in tech_categories.items():
+    st.markdown(f"""
+    <div class="apple-card">
+        <div style="font-size: 1.25rem; font-weight: 600; color: #f5f5f7; margin-bottom: 1rem;">
+            {category}
+        </div>
+        <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+            {"".join([f'<span class="ios-badge">{tech}</span>' for tech in techs])}
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+st.markdown('</div>', unsafe_allow_html=True)
+# DISTRIBUCION DE 
+st.markdown('<div class="content-section section-dark" id="documentacion">', unsafe_allow_html=True)
+st.markdown('<div class="section-title">Distribución de archivos</div>', unsafe_allow_html=True)
+
+# Cargar imagen con efecto premium
+pipeline_img = load_image("archivos.png")
+if pipeline_img:
+    st.image(pipeline_img, use_container_width=True)
+    st.markdown('</div>', unsafe_allow_html=True)
+
+
+# SECCIÓN: DOCUMENTACIÓN
+st.markdown('<div class="content-section section-dark" id="documentacion">', unsafe_allow_html=True)
+st.markdown('<div class="section-title">Test en ambiente local</div>', unsafe_allow_html=True)
+st.markdown('<div class="section-subtitle">Guías completas para instalación, uso y despliegue</div>', unsafe_allow_html=True)
+
+col1, col2 = st.columns(2)
+
+with col1:
+    st.markdown("""
+    <div class="apple-card">
+        <div class="card-title" style="font-size: 1.5rem;">Instalación Rápida</div>
+        <pre style="color: #0071e3;">
+# Clonar repositorio
+git clone https://github.com/tu-usuario/proyecto-icfes.git
+cd proyecto-icfes
+
+# ingresar a la carpeta
+cd proyecto-icfes
+
+# Ejecutar Docker
+docker-compose up --build
+    """, unsafe_allow_html=True)
+
+with col2:
+    st.markdown("""
+    <div class="apple-card">
+        <div class="card-title" style="font-size: 1.5rem;">Uso de la API</div>
+        <pre style="color: #0071e3;">
+# Realizar predicción
+curl -X POST "http://localhost:8000/predict" \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "ingles": 65,
+    "comunicacion_escrita": 70,
+    "competencias_ciudadanas": 68,
+    "lectura_critica": 72,
+    "razonamiento_cuantitativo": 75
+  }'
+
+# Respuesta
+{
+  "puntaje_global": 285.4,
+  "modelo_version": "v1.2.0"
+}
+        </pre>
     </div>
     """, unsafe_allow_html=True)
 
