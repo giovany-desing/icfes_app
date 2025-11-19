@@ -10,33 +10,42 @@ warnings.filterwarnings('ignore')
 
 
 def load_image(image_path):
-    """Carga una imagen de forma segura con múltiples intentos de ruta"""
+    """Carga y renderiza una imagen con la máxima resolución y calidad posible"""
     possible_paths = [
         image_path,
         Path(image_path),
         Path(__file__).parent / image_path,
         Path.cwd() / image_path,
+        Path(__file__).parent / "images" / image_path,
+        Path.cwd() / "images" / image_path,
     ]
-    
+
     for path in possible_paths:
         try:
             if Path(path).exists():
-                return Image.open(path)
+                # Cargar imagen original sin alteraciones
+                original_image = Image.open(path)
+                
+                # Preservar TODOS los datos de la imagen
+                original_image.load()
+                
+                # Convertir a RGB solo si es necesario para compatibilidad
+                if original_image.mode in ('P', 'RGBA', 'LA'):
+                    # Preservar transparencia si existe
+                    if original_image.mode in ('RGBA', 'LA'):
+                        image_rgb = Image.new('RGBA', original_image.size)
+                        image_rgb.paste(original_image, (0, 0))
+                    else:
+                        image_rgb = original_image.convert('RGB')
+                else:
+                    image_rgb = original_image
+                
+                return image_rgb
+                
         except Exception as e:
             continue
-    
-    st.error(f"""
-    ⚠️ **Image not found:** `{image_path}`
-    
-    **Paths tried:**
-    - `{Path.cwd() / image_path}`
-    - `{Path(__file__).parent / image_path}`
-    
-    **Please ensure:**
-    - File exists in the same folder as `app.py`
-    - Filename matches exactly (case-sensitive)
-    - File is a valid image (.png, .jpg, etc.)
-    """)
+
+    st.error(f"❌ No se pudo cargar la imagen: {image_path}")
     return None
 
 
@@ -404,6 +413,22 @@ st.markdown("""
         margin-bottom: 0.5rem !important;
     }
     
+    /* Text input estilo Apple */
+    .stTextInput > div > div > input {
+        background: rgba(255, 255, 255, 0.05) !important;
+        border: 0.5px solid rgba(255, 255, 255, 0.2) !important;
+        border-radius: 12px !important;
+        color: #f5f5f7 !important;
+        font-size: 1rem !important;
+        padding: 0.75rem 1rem !important;
+    }
+    
+    .stTextInput label {
+        color: #f5f5f7 !important;
+        font-weight: 500 !important;
+        font-size: 0.9375rem !important;
+    }
+    
     /* Botón de Streamlit estilo Apple */
     .stButton > button {
         background: linear-gradient(135deg, #0071e3, #0077ed) !important;
@@ -450,78 +475,95 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# Hero Section
+# ==================== MÉTRICAS IMPACTANTES ====================
+st.markdown('<div class="section-title">🎓 Predicción de Puntajes ICFES</div>', unsafe_allow_html=True)
+st.markdown('<div class="content-section section-dark">', unsafe_allow_html=True)
 st.markdown("""
-<div class="hero-section">
-    <div class="hero-title">Proyecto de Machine Learning con enfoque en MLOps</div>
-    <div class="hero-subtitle">
-        Predicción del puntaje global ICFES mediante Gradient Boosting
+<div style="text-align: center; margin-bottom: 3rem;">
+    <div style="font-size: 2rem; font-weight: 600; color: #f5f5f7; margin-bottom: 0.5rem;">
     </div>
-    <div class="hero-cta">
-        <a href="https://github.com/giovany-desing/proyecto_icfes" target="_blank" class="apple-button">
-            Ver Código en GitHub
-        </a>
+    <div style="font-size: 1.125rem; color: #86868b;">
+        Este proyecto representa una implementación completa de MLOps siguiendo los estándares de la industria moderna, diseñado
+        para predecir con alta precisión los puntajes del examen ICFES. Va más allá de un simple modelo de machine
+        learning: es un sistema productivo end-to-end que integra automatización, versionado, experimentación sistemática y
+        deployment continuo.
     </div>
 </div>
 """, unsafe_allow_html=True)
 
-st.markdown("""
-<div class="hero-section">
-     <div class="hero-subtitle">
-        Mi enfoque para el desarrollo de Machine Learning va más allá del modelo, diseño y construyo sistemas de MLOps completos, robustos y listos para producción.
-        Entiendo que la reproducibilidad, la calidad del software y la automatización son la base del éxito. Por ello, implemento arquitecturas modulares que separan la lógica, la configuración y los datos. Mi flujo de trabajo incluye:
-    </div>
-</div>
-""", unsafe_allow_html=True)
 
-# SECCIÓN: MLOPS
+
+# ==================== ARQUITECTURA DEL SISTEMA ====================
+st.markdown('<div class="content-section section-light">', unsafe_allow_html=True)
+st.markdown('<div class="section-title">Stack tecnológico</div>', unsafe_allow_html=True)
+# ==================== MLOPS FEATURES ====================
 st.markdown("""
 <div class="feature-grid">
     <div class="feature-item">
         <span class="feature-icon">📊</span>
-        <div class="feature-name">MLflow</div>
-        <div class="feature-desc">Tracking de experimentos y registro de modelos</div>
+        <div class="feature-name">EXPERIMENTACIÓN</div>
+        <div class="feature-desc">MLflow + Optuna</div>
         <div style="margin-top: 1rem;">
-            <span class="ios-badge">Tracking</span>
-            <span class="ios-badge">Registry</span>
         </div>
     </div>
     <div class="feature-item">
         <span class="feature-icon">🗄️</span>
-        <div class="feature-name">DVC</div>
-        <div class="feature-desc">Versionamiento de datos y reproducibilidad</div>
+        <div class="feature-name">VERSIONADO</div>
+        <div class="feature-desc">Git + DVC + AWS S3</div>
         <div style="margin-top: 1rem;">
-            <span class="ios-badge">Data Version</span>
-            <span class="ios-badge">Pipeline</span>
-        </div>
-    </div>
-    <div class="feature-item">
-        <span class="feature-icon">🔄</span>
-        <div class="feature-name">Apache Airflow</div>
-        <div class="feature-desc">Orquestación y automatización de pipelines</div>
-        <div style="margin-top: 1rem;">
-            <span class="ios-badge">Automation</span>
-            <span class="ios-badge">Scheduling</span>
         </div>
     </div>
     <div class="feature-item">
         <span class="feature-icon">🚀</span>
-        <div class="feature-name">FastAPI</div>
-        <div class="feature-desc">API REST de alto rendimiento</div>
+        <div class="feature-name">API PRODUCCIÓN</div>
+        <div class="feature-desc">FastAPI + Uvicorn</div>
         <div style="margin-top: 1rem;">
-            <span class="ios-badge">API</span>
-            <span class="ios-badge">Docker</span>
+        </div>
+    </div>
+        <div class="feature-item">
+        <span class="feature-icon">🧠</span>
+        <div class="feature-name">ENTRENAMIENTO</div>
+        <div class="feature-desc">scikit-learn, XGBoost </div>
+        <div style="margin-top: 1rem;">
+        </div>
+    </div>
+        <div class="feature-item">
+        <span class="feature-icon">🔄</span>
+        <div class="feature-name">CI/CD </div>
+        <div class="feature-desc">GitHub Actions</div>
+        <div style="margin-top: 1rem;">
+        </div>
+    </div>
+        <div class="feature-item">
+        <span class="feature-icon">🐳</span>
+        <div class="feature-name">CONTAINERIZACIÓN</div>
+        <div class="feature-desc">Docker + Docker Hub </div>
+        <div style="margin-top: 1rem;">
+        </div>
+    </div>
+        <div class="feature-item">
+        <span class="feature-icon">🌐</span>
+        <div class="feature-name">DEPLOYMENT</div>
+        <div class="feature-desc">Render (PaaS) </div>
+        <div style="margin-top: 1rem;">
+        </div>
+    </div>
+        <div class="feature-item">
+        <span class="feature-icon">👀</span>
+        <div class="feature-name">MONITOREO</div>
+        <div class="feature-desc">Structured Logging + Health Checks </div>
+        <div style="margin-top: 1rem;">
         </div>
     </div>
 </div>
 """, unsafe_allow_html=True)
 
-# SECCIÓN DE PREDICCIÓN - API INTERACTIVA
+arch_components = st.columns(3)
+# ==================== SECCIÓN DE PREDICCIÓN INTERACTIVA ====================
 st.markdown('<div class="content-section section-dark">', unsafe_allow_html=True)
 st.markdown('<div class="section-title">Prueba el Modelo en Vivo</div>', unsafe_allow_html=True)
 st.markdown('<div class="section-subtitle">Ingresa los puntajes de cada área y obtén la predicción del puntaje global ICFES</div>', unsafe_allow_html=True)
 
-# Inicializar session state para el resultado
 if 'prediction_result' not in st.session_state:
     st.session_state.prediction_result = None
 if 'prediction_error' not in st.session_state:
@@ -540,8 +582,7 @@ with col1:
         </div>
     </div>
     """, unsafe_allow_html=True)
-    
-    # Inputs con valores por defecto - usando los nombres correctos para la API
+
     ingles = st.number_input(
         "🌍 Puntaje de Inglés",
         min_value=0,
@@ -551,7 +592,7 @@ with col1:
         help="Ingresa el puntaje obtenido en Inglés (0-100)",
         key="ingles_input"
     )
-    
+
     comunicacion = st.number_input(
         "✍️ Comunicación Escrita",
         min_value=0,
@@ -561,7 +602,7 @@ with col1:
         help="Ingresa el puntaje obtenido en Comunicación Escrita (0-100)",
         key="comunicacion_input"
     )
-    
+
     competencias = st.number_input(
         "🤝 Competencias Ciudadanas",
         min_value=0,
@@ -571,7 +612,7 @@ with col1:
         help="Ingresa el puntaje obtenido en Competencias Ciudadanas (0-100)",
         key="competencias_input"
     )
-    
+
     lectura = st.number_input(
         "📖 Lectura Crítica",
         min_value=0,
@@ -581,7 +622,7 @@ with col1:
         help="Ingresa el puntaje obtenido en Lectura Crítica (0-100)",
         key="lectura_input"
     )
-    
+
     razonamiento = st.number_input(
         "🔢 Razonamiento Cuantitativo",
         min_value=0,
@@ -601,22 +642,17 @@ with col2:
         </div>
     </div>
     """, unsafe_allow_html=True)
-    
-    # CONTENIDO DINÁMICO - TODOS LOS ESTADOS EN EL MISMO CUADRO
+
     if st.session_state.prediction_result:
-        # Buscar el valor de predicted_score específicamente
         prediction_value = None
-        
-        # Buscar en diferentes claves posibles
-        prediction_keys = ['predicted_score', 'r_Copy to clipboard', 'puntaje_global', 'PUNT_GLOBAL', 'prediction', 'score', 'result']
-        
+        prediction_keys = ['predicted_score', 'result', 'puntaje_global', 'PUNT_GLOBAL', 'prediction', 'score']
+
         for key in prediction_keys:
             if key in st.session_state.prediction_result:
                 prediction_value = st.session_state.prediction_result[key]
                 break
-        
+
         if prediction_value is not None:
-            # MOSTRAR SOLO EL NÚMERO DE LA PREDICCIÓN EN EL CUADRO PRINCIPAL
             st.markdown(f"""
             <div class="apple-card" style="background: linear-gradient(135deg, rgba(0, 113, 227, 0.15) 0%, rgba(0, 113, 227, 0.05) 100%); border-color: rgba(0, 113, 227, 0.3);">
                 <div style="text-align: center; padding: 2rem 0;">
@@ -633,21 +669,17 @@ with col2:
             </div>
             """, unsafe_allow_html=True)
         else:
-            # Si no encontramos el valor de predicción, mostrar mensaje de error
-            st.markdown(f"""
+            st.markdown("""
             <div class="apple-card" style="background: rgba(255, 204, 0, 0.1); border-color: rgba(255, 204, 0, 0.3);">
                 <div style="text-align: center; padding: 2rem;">
                     <div style="font-size: 3rem; margin-bottom: 1rem;">⚠️</div>
                     <div style="color: #ffcc00; font-size: 1.125rem; font-weight: 500;">
                         No se pudo obtener la predicción
                     </div>
-                    <div style="color: #86868b; font-size: 0.875rem; margin-top: 0.5rem;">
-                        La respuesta de la API no contiene el valor de predicción
-                    </div>
                 </div>
             </div>
             """, unsafe_allow_html=True)
-    
+
     elif st.session_state.prediction_error:
         st.markdown(f"""
         <div class="apple-card" style="background: rgba(255, 59, 48, 0.1); border-color: rgba(255, 59, 48, 0.3);">
@@ -662,9 +694,8 @@ with col2:
             </div>
         </div>
         """, unsafe_allow_html=True)
-    
+
     else:
-        # ESTADO INICIAL - Mismo cuadro que se transforma con el resultado
         st.markdown("""
         <div class="apple-card" style="background: rgba(255, 255, 255, 0.02);">
             <div style="text-align: center; padding: 3rem 1rem;">
@@ -676,22 +707,19 @@ with col2:
         </div>
         """, unsafe_allow_html=True)
 
-# Botón de predicción centrado
 st.markdown('<div style="margin: 2rem 0;">', unsafe_allow_html=True)
 
-# Configuración del endpoint - AHORA NO EDITABLE
 st.text_input(
     "🔗 URL del Endpoint de Predicción",
-    value="https://proyecto-icfes-pv4t.onrender.com/predict/",
+    value="https://prediccion-icfes-latest.onrender.com/predict",
     help="Endpoint configurado para realizar las predicciones",
     key="api_endpoint",
-    disabled=True  # Esto hace que no se pueda editar
+    disabled=True
 )
 
 if st.button("🚀 Realizar Predicción", use_container_width=False, key="predict_button"):
     with st.spinner("Procesando predicción..."):
         try:
-            # Preparar datos para el endpoint en el formato correcto
             payload = {
                 "MOD_INGLES_PNAL": float(ingles),
                 "MOD_COMUNI_ESCRITA_PNAL": float(comunicacion),
@@ -699,18 +727,16 @@ if st.button("🚀 Realizar Predicción", use_container_width=False, key="predic
                 "MOD_LECTURA_CRITICA_PNAL": float(lectura),
                 "MOD_RAZONA_CUANTITATIVO_PNAL": float(razonamiento)
             }
-            
-            # Realizar petición al endpoint
+
             response = requests.post(
-                "https://proyecto-icfes-pv4t.onrender.com/predict/",  # URL fija
+                "https://proyecto-icfes-pv4t.onrender.com/predict/",
                 json=payload,
                 headers={"Content-Type": "application/json"},
                 timeout=30
             )
-            
-            # Guardar respuesta raw para debugging
-            st.session_state.api_response_raw = f"Status: {response.status_code}\nHeaders: {dict(response.headers)}\nBody: {response.text}"
-            
+
+            st.session_state.api_response_raw = f"Status: {response.status_code}\nBody: {response.text}"
+
             if response.status_code == 200:
                 try:
                     result = response.json()
@@ -724,151 +750,45 @@ if st.button("🚀 Realizar Predicción", use_container_width=False, key="predic
                 error_message = f"Error {response.status_code}: {response.text}"
                 st.session_state.prediction_error = error_message
                 st.session_state.prediction_result = None
-            
+
             st.rerun()
-                
+
         except requests.exceptions.ConnectionError:
-            error_message = "No se pudo conectar con la API. Verifica que el servidor esté ejecutándose."
-            st.session_state.prediction_error = error_message
+            st.session_state.prediction_error = "No se pudo conectar con la API."
             st.session_state.prediction_result = None
-            st.error(f"❌ {error_message}")
+            st.error("❌ No se pudo conectar con la API")
         except requests.exceptions.Timeout:
-            error_message = "La solicitud tardó demasiado tiempo. Intenta nuevamente."
-            st.session_state.prediction_error = error_message
+            st.session_state.prediction_error = "La solicitud tardó demasiado tiempo."
             st.session_state.prediction_result = None
-            st.error(f"⏱️ {error_message}")
+            st.error("⏱️ Timeout")
         except Exception as e:
-            error_message = f"Error inesperado: {str(e)}"
-            st.session_state.prediction_error = error_message
+            st.session_state.prediction_error = f"Error: {str(e)}"
             st.session_state.prediction_result = None
-            st.error(f"❌ {error_message}")
+            st.error(f"❌ {str(e)}")
 
 st.markdown('</div>', unsafe_allow_html=True)
 st.markdown('</div>', unsafe_allow_html=True)
-
-# El resto del código permanece igual...
-# [SECCIONES DE METODOLOGÍA, STACK TÉCNICO, DOCUMENTACIÓN, RESULTADOS, FOOTER]
-# ... (mantener todo el código restante igual)
+# ==================== FIN TEST ENDPOINT ====================
 
 
-# SECCIÓN: RESULTADOS
-st.markdown('<div class="content-section section-light">', unsafe_allow_html=True)
-
-# Importancia de features
+# github
 st.markdown("""
-<div class="apple-card">
-    <div class="card-title" style="font-size: 1.5rem;">Importancia de Features</div>
+<div class="hero-section">
+    <div class="hero-cta">
+        <a href="https://github.com/giovany-desing/predecir-puntaje-icfes-final" target="_blank" class="apple-button">
+            Ver Código en GitHub
+        </a>
+        <a href="https://github.com/giovany-desing/predecir-puntaje-icfes-final/blob/main/README.md" target="_blank" class="apple-button">
+            ir a Documentación
+        </a>
+    </div>
 </div>
 """, unsafe_allow_html=True)
 
-features = [
-    ("Razonamiento Cuantitativo", 32),
-    ("Lectura Crítica", 28),
-    ("Inglés", 22),
-    ("Competencias Ciudadanas", 11),
-    ("Comunicación Escrita", 7)
-]
 
-for feature, importance in features:
-    st.markdown(f"""
-    <div class="apple-card" style="padding: 1.25rem; margin: 0.5rem 0;">
-        <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem;">
-            <span style="font-weight: 500; color: #f5f5f7;">{feature}</span>
-            <span style="color: #0071e3; font-weight: 600;">{importance}%</span>
-        </div>
-        <div class="ios-progress">
-            <div class="ios-progress-fill" style="width: {importance}%;"></div>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-
-# Comparación de modelos
-st.markdown("""
-<div class="apple-card" style="margin-top: 3rem;">
-    <div class="card-title" style="font-size: 1.5rem;">Comparación de Modelos</div>
-</div>
-""", unsafe_allow_html=True)
-
-models_data = {
-    'Modelo': ['Gradient Boosting', 'Random Forest', 'XGBoost', 'Linear Regression'],
-    'R² Score': [0.952, 0.938, 0.945, 0.812],
-    'RMSE': [12.3, 14.2, 13.1, 22.5],
-    'Tiempo (s)': [2.3, 1.8, 2.1, 0.5]
-}
-df_models = pd.DataFrame(models_data)
-
-st.dataframe(
-    df_models.style.highlight_max(subset=['R² Score'], color='rgba(0, 113, 227, 0.2)')
-                  .highlight_min(subset=['RMSE', 'Tiempo (s)'], color='rgba(0, 113, 227, 0.2)')
-                  .format({'R² Score': '{:.3f}', 'RMSE': '{:.1f}', 'Tiempo (s)': '{:.1f}'}),
-    use_container_width=True
-)
-
-
-# SECCIÓN: METODOLOGÍA
-st.markdown('<div class="content-section section-light">', unsafe_allow_html=True)
-st.markdown('<div class="section-title">Metodología de Machine Learning</div>', unsafe_allow_html=True)
-st.markdown('<div class="section-subtitle">GradientBoostingRegressor optimizado para capturar relaciones complejas</div>', unsafe_allow_html=True)
-
-col1, col2 = st.columns(2)
-
-with col1:
-    st.markdown("""
-    <div class="apple-card">
-        <div class="card-title" style="font-size: 1.5rem;">Ventajas</div>
-        <ul class="apple-list">
-            <li>Precisión superior al 95%</li>
-            <li>Manejo automático de correlaciones</li>
-            <li>Robusto ante valores atípicos</li>
-            <li>Captura patrones no lineales</li>
-            <li>Interpretabilidad clara</li>
-        </ul>
-    </div>
-    """, unsafe_allow_html=True)
-
-with col2:
-    st.markdown("""
-    <div class="apple-card">
-        <div class="card-title" style="font-size: 1.5rem;">Hiperparámetros</div>
-        <ul class="apple-list">
-            <li>n_estimators: 200</li>
-            <li>learning_rate: 0.1</li>
-            <li>max_depth: 5</li>
-            <li>min_samples_split: 10</li>
-            <li>subsample: 0.8</li>
-        </ul>
-    </div>
-    """, unsafe_allow_html=True)
-
-
-# SECCIÓN: STACK TÉCNICO
-st.markdown('<div class="content-section section-light">', unsafe_allow_html=True)
-st.markdown('<div class="section-title">Stack Tecnológico</div>', unsafe_allow_html=True)
-st.markdown('<div class="section-subtitle">Construido con las herramientas más modernas del ecosistema ML</div>', unsafe_allow_html=True)
-
-tech_categories = {
-    "Machine Learning": ["Python 3.9+", "Scikit-learn", "Pandas", "NumPy"],
-    "MLOps": ["MLflow", "DVC",],
-    "API & Deployment": ["FastAPI","Docker"],
-    "Testing": ["Pytest", "GitHub Actions"]
-}
-
-for category, techs in tech_categories.items():
-    st.markdown(f"""
-    <div class="apple-card">
-        <div style="font-size: 1.25rem; font-weight: 600; color: #f5f5f7; margin-bottom: 1rem;">
-            {category}
-        </div>
-        <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
-            {"".join([f'<span class="ios-badge">{tech}</span>' for tech in techs])}
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-
-st.markdown('</div>', unsafe_allow_html=True)
-# DISTRIBUCION DE 
+# DISTRIBUCION DE ARCHIVOS
 st.markdown('<div class="content-section section-dark" id="documentacion">', unsafe_allow_html=True)
-st.markdown('<div class="section-title">Distribución de archivos</div>', unsafe_allow_html=True)
+st.markdown('<div class="section-title">Archivos del proyecto</div>', unsafe_allow_html=True)
 
 # Cargar imagen con efecto premium
 pipeline_img = load_image("archivos.png")
@@ -876,54 +796,19 @@ if pipeline_img:
     st.image(pipeline_img, use_container_width=True)
     st.markdown('</div>', unsafe_allow_html=True)
 
-
-# SECCIÓN: DOCUMENTACIÓN
+# PIPELINE DE DATOS
 st.markdown('<div class="content-section section-dark" id="documentacion">', unsafe_allow_html=True)
-st.markdown('<div class="section-title">Test en ambiente local</div>', unsafe_allow_html=True)
-st.markdown('<div class="section-subtitle">Guías completas para instalación, uso y despliegue</div>', unsafe_allow_html=True)
+st.markdown('<div class="section-title">Flujos del proyecto</div>', unsafe_allow_html=True)
 
-col1, col2 = st.columns(2)
+# Cargar imagen con efecto premium
+pipeline_img = load_image("flujos.png")
+if pipeline_img:
+    st.image(pipeline_img, use_container_width=True)
+    st.markdown('</div>', unsafe_allow_html=True)
 
-with col1:
-    st.markdown("""
-    <div class="apple-card">
-        <div class="card-title" style="font-size: 1.5rem;">Instalación Rápida</div>
-        <pre style="color: #0071e3;">
-# Clonar repositorio
-git clone https://github.com/tu-usuario/proyecto-icfes.git
-cd proyecto-icfes
 
-# ingresar a la carpeta
-cd proyecto-icfes
 
-# Ejecutar Docker
-docker-compose up --build
-    """, unsafe_allow_html=True)
-
-with col2:
-    st.markdown("""
-    <div class="apple-card">
-        <div class="card-title" style="font-size: 1.5rem;">Uso de la API</div>
-        <pre style="color: #0071e3;">
-# Realizar predicción
-curl -X POST "http://localhost:8000/predict" \\
-  -H "Content-Type: application/json" \\
-  -d '{
-    "ingles": 65,
-    "comunicacion_escrita": 70,
-    "competencias_ciudadanas": 68,
-    "lectura_critica": 72,
-    "razonamiento_cuantitativo": 75
-  }'
-
-# Respuesta
-{
-  "puntaje_global": 285.4,
-  "modelo_version": "v1.2.0"
-}
-        </pre>
-    </div>
-    """, unsafe_allow_html=True)
 
 st.markdown('</div>', unsafe_allow_html=True)
 
+# ==================== FOOTER ====================
