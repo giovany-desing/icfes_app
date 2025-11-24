@@ -709,12 +709,13 @@ with col2:
 
 st.markdown('<div style="margin: 2rem 0;">', unsafe_allow_html=True)
 
-st.text_input(
+# URL CONFIGURABLE - CAMBIO PRINCIPAL AQUÍ
+api_url = st.text_input(
     "🔗 URL del Endpoint de Predicción",
     value="https://prediccion-icfes-latest.onrender.com/predict",
-    help="Endpoint configurado para realizar las predicciones",
+    help="Endpoint configurado para realizar las predicciones (editable)",
     key="api_endpoint",
-    disabled=True
+    disabled=False  # ← Ahora es editable
 )
 
 if st.button("🚀 Realizar Predicción", use_container_width=False, key="predict_button"):
@@ -728,8 +729,9 @@ if st.button("🚀 Realizar Predicción", use_container_width=False, key="predic
                 "MOD_RAZONA_CUANTITATIVO_PNAL": float(razonamiento)
             }
 
+            # USAR LA URL DEL INPUT - CAMBIO PRINCIPAL AQUÍ
             response = requests.post(
-                "https://proyecto-icfes-pv4t.onrender.com/predict/",
+                api_url,  # ← Usa la URL configurable
                 json=payload,
                 headers={"Content-Type": "application/json"},
                 timeout=30
@@ -810,5 +812,3 @@ if pipeline_img:
 
 
 st.markdown('</div>', unsafe_allow_html=True)
-
-# ==================== FOOTER ====================
