@@ -1183,15 +1183,15 @@ def show_dashboard():
             <h5 style="background: linear-gradient(90deg, #1E3A8A 0%, #3B82F6 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 700; margin: 0 0 0.2rem 0; font-size: 0.9rem; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">Trazabilidad End-to-End</h5>
             <p style="color: #475569; margin: 0; font-size: 0.75rem; line-height: 1.3; font-weight: 400; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">Desde el CSV crudo hasta la predicción en producción: cada dato validado, cada experimento registrado, cada deployment trackeado. Fundamental para debugging, auditorías y regulaciones.</p>
         </div>
-    </div>
-    """, unsafe_allow_html=True)
+        </div>
+        """, unsafe_allow_html=True)
     
     st.markdown("---")
     
     # Quick Overview
     st.markdown('<h3 class="section-header">Pipelines</h3>', unsafe_allow_html=True)
     
-    tab1, tab2, tab3, tab4, tab5 = st.tabs(["Pipeline de predicción", "Pipeline de entrenamiento", "distribución de archivos", "Endpoints de la API", "Arquitectura de la API"])
+    tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(["Pipeline de predicción", "Pipeline de entrenamiento", "distribución de archivos", "Endpoints de la API", "Arquitectura de la API", "Stack Tecnológico"])
     
     with tab1:
         # Título principal
@@ -2030,14 +2030,14 @@ git push origin main
             # Contenido exacto del archivo contexto.md
             contexto_content = """ 
 predecir-puntaje-icfes-final/
-  │
-  ├── 📁 api/
+ │
+ ├── 📁 api/
   │   └── app.py                          # API FastAPI - Endpoints REST y startup del modelo
-  │
-  ├── 📁 train_model/
+ │
+ ├── 📁 train_model/
   │   └── train_model.py                  # Pipeline completo de entrenamiento con Optuna + MLflow
-  │
-  ├── 📁 utils/
+ │
+ ├── 📁 utils/
   │   ├── data_clean.py                   # DataPipeline - Limpieza y validación de datos (7 pasos)
   │   └── config.py                       # Singleton - Configuración centralizada del proyecto
   │
@@ -2051,8 +2051,8 @@ predecir-puntaje-icfes-final/
   │   ├── model_metadata.pkl              # Metadata: métricas, params, git hash - NO en Git
   │   ├── best_model.pkl.dvc              # Puntero DVC - Hash MD5 del modelo
   │   └── model_metadata.pkl.dvc          # Puntero DVC - Hash MD5 de metadata
-  │
-  ├── 📁 plots_temp/
+ │
+ ├── 📁 plots_temp/
   │   ├── RandomForest_optimization_history.png      # Gráfica Optuna trials RandomForest
   │   ├── GradientBoosting_optimization_history.png  # Gráfica Optuna trials GradientBoosting
   │   └── XGBoost_optimization_history.png           # Gráfica Optuna trials XGBoost
@@ -2898,6 +2898,117 @@ Content-Type: application/json
                         </p>
                     </div>
                     """, unsafe_allow_html=True)
+        
+        with tab6:
+            # Título principal
+            st.markdown("""
+            <div style='text-align: center; margin-bottom: 2rem; padding: 1.5rem; background: linear-gradient(135deg, #7C3AED 0%, #A855F7 100%); border-radius: 12px;'>
+                <h2 style='color: white; margin: 0; font-size: 1.8rem; font-weight: 700;'>
+                    🛠️ Stack Tecnológico
+                </h2>
+                <p style='color: rgba(255,255,255,0.9); margin: 0.5rem 0 0 0; font-size: 1rem;'>Tecnologías y herramientas utilizadas en el proyecto</p>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            # Machine Learning
+            st.markdown("### 🤖 Machine Learning")
+            ml_data = {
+                "Tecnología": ["scikit-learn", "XGBoost", "NumPy", "Pandas", "Joblib"],
+                "Rol en el Proyecto": [
+                    "Framework principal ML: Pipeline con StandardScaler, RandomForest ganador, cross-validation",
+                    "Algoritmo candidato evaluado en optimización (uno de los 3 modelos comparados)",
+                    "Manipulación de arrays para transformación de features y predicciones vectorizadas",
+                    "Carga y procesamiento del dataset CSV, manipulación de DataFrames en DataPipeline",
+                    "Serialización/deserialización del modelo (best_model.pkl) y metadata para persistencia"
+                ]
+            }
+            st.dataframe(ml_data, use_container_width=True, hide_index=True)
+            
+            st.markdown("---")
+            
+            # MLOps & Experimentación
+            st.markdown("### 📊 MLOps & Experimentación")
+            mlops_data = {
+                "Tecnología": ["MLflow", "Optuna", "DVC (Data Version Control)", "DVC-S3"],
+                "Rol en el Proyecto": [
+                    "Tracking de 150+ experimentos: parámetros, métricas (R², MAE, RMSE), artifacts y tags de trazabilidad",
+                    "Optimización bayesiana de hiperparámetros: 50 trials × 3 modelos con búsqueda TPE sampler",
+                    "Versionado de datasets (8.1 MB) y modelos (714 KB) con hashes MD5, gestión de archivos pesados",
+                    "Plugin para storage remoto: push/pull de datos y modelos desde AWS S3"
+                ]
+            }
+            st.dataframe(mlops_data, use_container_width=True, hide_index=True)
+            
+            st.markdown("---")
+            
+            # API & Web Framework
+            st.markdown("### 🌐 API & Web Framework")
+            api_data = {
+                "Tecnología": ["FastAPI", "Pydantic", "Uvicorn", "Starlette"],
+                "Rol en el Proyecto": [
+                    "Framework API REST: endpoints /predict/, /health, /docs con validación automática",
+                    "Validación de schemas de input/output, generación dinámica de modelos desde config.yaml",
+                    "Servidor ASGI de alto rendimiento para servir la API en producción",
+                    "Base ASGI de FastAPI, manejo de requests/responses asíncronos"
+                ]
+            }
+            st.dataframe(api_data, use_container_width=True, hide_index=True)
+            
+            st.markdown("---")
+            
+            # Versionado & Storage
+            st.markdown("### 💾 Versionado & Storage")
+            versionado_data = {
+                "Tecnología": ["Git", "GitHub", "AWS S3", "Boto3"],
+                "Rol en el Proyecto": [
+                    "Control de versiones del código, tracking de cambios, commits hasheados en metadata",
+                    "Repositorio remoto, trigger de CI/CD, almacenamiento de .dvc files",
+                    "Bucket proyecto-icfes-data: storage remoto para datasets y modelos versionados con DVC",
+                    "SDK Python para interacción con AWS S3 (usado por DVC internamente)"
+                ]
+            }
+            st.dataframe(versionado_data, use_container_width=True, hide_index=True)
+            
+            st.markdown("---")
+            
+            # DevOps & CI/CD
+            st.markdown("### 🚀 DevOps & CI/CD")
+            devops_data = {
+                "Tecnología": ["GitHub Actions", "Docker", "Docker Hub"],
+                "Rol en el Proyecto": [
+                    "Pipeline CI/CD automatizado: pull data → train → build Docker → deploy (8-12 min)",
+                    "Containerización de la API: imagen Python 3.9 slim con modelo incluido (~800 MB)",
+                    "Registry de imágenes: almacena 3016953459/prediccion-icfes:latest"
+                ]
+            }
+            st.dataframe(devops_data, use_container_width=True, hide_index=True)
+            
+            st.markdown("---")
+            
+            # Deployment & Infrastructure
+            st.markdown("### ☁️ Deployment & Infrastructure")
+            deployment_data = {
+                "Tecnología": ["Render", "AWS"],
+                "Rol en el Proyecto": [
+                    "Plataforma PaaS: hosting de contenedor Docker, load balancing, auto-healing, webhooks de deploy",
+                    "Infraestructura cloud: S3 para storage, IAM para credenciales"
+                ]
+            }
+            st.dataframe(deployment_data, use_container_width=True, hide_index=True)
+            
+            st.markdown("---")
+            
+            # Configuration & Utilities
+            st.markdown("### 🛠️ Configuration & Utilities")
+            config_data = {
+                "Tecnología": ["PyYAML", "Python-dotenv", "Logging (stdlib)"],
+                "Rol en el Proyecto": [
+                    "Parsing de config.yaml: carga configuración centralizada (features, paths, params)",
+                    "Gestión de variables de entorno (.env files) para credenciales locales",
+                    "Sistema de logging estructurado: timestamps, niveles, trazabilidad de predicciones"
+                ]
+            }
+            st.dataframe(config_data, use_container_width=True, hide_index=True)
     
     # Feature Importance
     st.markdown('<h3 class="section-header">🎯 Importancia de Features</h3>', unsafe_allow_html=True)
