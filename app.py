@@ -20,7 +20,7 @@ warnings.filterwarnings('ignore')
 # CONFIGURACIÓN DE PÁGINA
 # ============================================================================
 st.set_page_config(
-    page_title="MLOps ICFES - Demo Profesional",
+    page_title="Sistema MLOps de Predicción puntajen ICFES",
     page_icon="🎯",
     layout="wide",
     initial_sidebar_state="collapsed"
@@ -1040,60 +1040,32 @@ def show_dashboard():
     """Dashboard principal"""
     
     # Sección de Portada
-    st.markdown('<h1 class="main-header">Sistema MLOps de Producción: Predicción ICFES</h1>', unsafe_allow_html=True)
+    st.markdown('<h1 class="main-header">Sistema MLOps de Predicción puntaje ICFES</h1>', unsafe_allow_html=True)
     
     portada_col1, portada_col2 = st.columns([1.5, 1])
     
     with portada_col1:
         st.markdown("""
-        **Pipeline end-to-end automatizado desde experimentación hasta deployment cloud con 98.4% de precisión.**
+        **Pipeline automatizado de Machine Learning en producción con 98.4% de precisión.**
         
-        Este no es un proyecto de tutorial. Es un **sistema de Machine Learning en producción real** que implementa el ciclo completo MLOps siguiendo estándares enterprise:
+        Este no es un proyecto de tutorial. Es un sistema ML productivo que implementa el ciclo completo MLOps siguiendo estándares enterprise: versionado de datos, experimentación sistemática, CI/CD automatizado y deployment continuo.
         
-        #### ⚡ Resultados Verificables
+        ---
         
-        - **Modelo en producción**: API REST desplegada en Render Cloud ([Ver API](https://prediccion-icfes-latest.onrender.com/docs))
+        <h4 style='background: linear-gradient(90deg, #1E3A8A 0%, #3B82F6 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800; margin: 1.5rem 0 1rem 0;'>API REST</h4>
         
-        - **Precisión**: 98.4% R² Score sobre ~9,000 registros
+        FastAPI expone el modelo para predecir el puntaje global ICFES a partir de los puntajes de 5 áreas individuales (Razonamiento Cuantitativo, Lectura Crítica, Competencias Ciudadanas, Inglés y Comunicación Escrita). El endpoint /predict/ recibe las 5 features, valida con schemas Pydantic dinámicos, transforma con StandardScaler y ejecuta inferencia RandomForest en <100ms. La API incluye /health para load balancers, /docs con Swagger UI y logging estructurado de todas las predicciones. Containerizada con Docker y servida por Uvicorn en producción, actualmente esta esta desplegada en render.com para servir como si fuera un ambiente productivo real.
         
-        - **Deployment automatizado**: Push to production en < 10 minutos con GitHub Actions
+        <h4 style='background: linear-gradient(90deg, #1E3A8A 0%, #3B82F6 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800; margin: 1.5rem 0 1rem 0;'>Entrenamiento del Modelo</h4>
         
-        - **Versionado completo**: Código (Git), Datos (DVC + S3), Experimentos (MLflow)
+        Extraje datos de los resultados SABER del año 2019 y construí un sistema que entrena, evalúa y selecciona automáticamente el mejor algoritmo de ML entre RandomForest, GradientBoosting y XGBoost mediante validación cruzada. DataPipeline ejecuta limpieza de datos en 7 etapas (eliminación de duplicados, nulos y outliers), seguido de split 80/20 con trazabilidad (git hash + data hash MD5). Optuna optimiza hiperparámetros con búsqueda bayesiana (50 trials por modelo, 3-fold CV), mientras MLflow registra parámetros, métricas y artifacts de cada experimento. El modelo ganador (RandomForest, R²=98.4%) se serializa con Joblib junto a metadata completa para reproducibilidad.
         
-        #### 🏗️ Arquitectura Enterprise Implementada
+        <h4 style='background: linear-gradient(90deg, #1E3A8A 0%, #3B82F6 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800; margin: 1.5rem 0 1rem 0;'>MLOps: Automatización y Trazabilidad</h4>
         
-        Git → DVC (S3) → Optuna (150 trials) → MLflow → Docker → GitHub Actions → Render
-        
-        **Stack**: FastAPI • scikit-learn • XGBoost • Optuna • MLflow • DVC • Docker • AWS S3 • GitHub Actions • Render
-        
-        #### 💡 Por qué esto demuestra habilidades avanzadas
-        
-        1. **Reproducibilidad total**: Cada modelo conoce qué código (`git commit`) y qué datos (`MD5 hash`) lo generaron
-        
-        2. **Experimentación sistemática**: 3 algoritmos, 150 trials de optimización bayesiana, tracking automático de 12+ métricas
-        
-        3. **CI/CD real**: El pipeline entrena, valida, construye imagen Docker y despliega automáticamente en cada push
-        
-        4. **Infraestructura como código**: Configuración centralizada, secrets management, zero-downtime deployments
-        
-        5. **Production-ready**: Health checks, validación de schemas, logging estructurado, manejo robusto de errores
-        
-        #### 📊 Complejidad Técnica
-        
-        - **600 líneas** de pipeline de entrenamiento con cross-validation, optimización y logging
-        
-        - **263 líneas** de pipeline de datos con validación exhaustiva
-        
-        - **170 dependencias** orquestadas correctamente
-        
-        - **API dinámica** con schemas Pydantic generados desde configuración
-        
-        - **Trazabilidad completa** de modelos con metadata (git hash, data hash, métricas, timestamps)
-        
-        **Esto no es solo código que funciona. Es código que escala, se mantiene y se audita.**
+        El sistema automatiza el ciclo completo ML desde versionado de datos hasta deployment continuo, garantizando reproducibilidad total. DVC versiona datasets y modelos en AWS S3 con hashes MD5, mientras MLflow registra cada experimento con parámetros, métricas y artifacts. GitHub Actions orquesta el pipeline CI/CD: cada push a main ejecuta descarga de datos (DVC), entrenamiento automático, build de imagen Docker y deployment en Render via webhook. Cada modelo almacena git commit hash, data hash y MLflow run ID, permitiendo recuperar cualquier versión exacta entrenada. Zero-downtime deployment con health checks garantiza disponibilidad continua.
         
         👉 **Explora la demo interactiva para hacer predicciones en tiempo real con el modelo desplegado.**
-        """)
+        """, unsafe_allow_html=True)
     
     with portada_col2:
         st.markdown("""
@@ -1179,13 +1151,40 @@ def show_dashboard():
                         """.format(prediction), unsafe_allow_html=True)
         
         st.markdown("---")
-        st.markdown("""
-        <div style='background: #F0F9FF; padding: 1rem; border-radius: 8px; border-left: 4px solid #3B82F6;'>
-            <p style='margin: 0; font-size: 0.9rem;'>
-            <strong>Endpoint:</strong> <code>https://prediccion-icfes-latest.onrender.com/predict</code>
-            </p>
+    
+    st.markdown("---")
+    
+    # Diseño Enterprise
+    st.markdown("""
+    <div style="background: white; padding: 0.9rem; border-radius: 10px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08); margin: 1rem 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
+        <h4 style="background: linear-gradient(90deg, #1E3A8A 0%, #3B82F6 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 700; margin: 0 0 0.5rem 0; font-size: 1.2rem; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">Diseño Enterprise</h4>
+        <p style="color: #475569; margin: 0 0 0.7rem 0; font-size: 0.8rem; line-height: 1.3; font-weight: 400; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">Este proyecto implementa estándares de ingeniería ML profesional, no código de tutorial:</p>
+        <div style="margin-bottom: 0.6rem;">
+            <h5 style="background: linear-gradient(90deg, #1E3A8A 0%, #3B82F6 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 700; margin: 0 0 0.2rem 0; font-size: 0.9rem; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">Reproducibilidad Total</h5>
+            <p style="color: #475569; margin: 0; font-size: 0.75rem; line-height: 1.3; font-weight: 400; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">Cada modelo almacena git commit hash, data hash MD5 y MLflow run ID. Puedes recrear exactamente cualquier versión entrenada meses después, cumpliendo requisitos de auditoría y compliance enterprise.</p>
         </div>
-        """, unsafe_allow_html=True)
+        <div style="margin-bottom: 0.6rem;">
+            <h5 style="background: linear-gradient(90deg, #1E3A8A 0%, #3B82F6 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 700; margin: 0 0 0.2rem 0; font-size: 0.9rem; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">Automatización Completa</h5>
+            <p style="color: #475569; margin: 0; font-size: 0.75rem; line-height: 1.3; font-weight: 400; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">Pipeline CI/CD sin intervención manual: push → descarga de datos → entrenamiento → build Docker → deployment con zero-downtime. Escala horizontalmente y permite rollback instantáneo.</p>
+        </div>
+        <div style="margin-bottom: 0.6rem;">
+            <h5 style="background: linear-gradient(90deg, #1E3A8A 0%, #3B82F6 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 700; margin: 0 0 0.2rem 0; font-size: 0.9rem; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">Versionado de Datos</h5>
+            <p style="color: #475569; margin: 0; font-size: 0.75rem; line-height: 1.3; font-weight: 400; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">DVC + AWS S3 trackea datasets y modelos con hashes MD5. Equipos colaboran sin conflictos en archivos grandes, garantizando que todos trabajen con las mismas versiones de datos.</p>
+        </div>
+        <div style="margin-bottom: 0.6rem;">
+            <h5 style="background: linear-gradient(90deg, #1E3A8A 0%, #3B82F6 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 700; margin: 0 0 0.2rem 0; font-size: 0.9rem; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">Experimentación Sistemática</h5>
+            <p style="color: #475569; margin: 0; font-size: 0.75rem; line-height: 1.3; font-weight: 400; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">MLflow registra automáticamente 150+ experimentos con Optuna (búsqueda bayesiana, no trial-and-error manual). Decisiones basadas en métricas comparables, no intuición.</p>
+        </div>
+        <div style="margin-bottom: 0.6rem;">
+            <h5 style="background: linear-gradient(90deg, #1E3A8A 0%, #3B82F6 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 700; margin: 0 0 0.2rem 0; font-size: 0.9rem; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">API Production-Ready</h5>
+            <p style="color: #475569; margin: 0; font-size: 0.75rem; line-height: 1.3; font-weight: 400; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">FastAPI con health checks para load balancers, validación Pydantic automática, logging estructurado y Swagger docs. Lista para integrarse con sistemas empresariales y escalar horizontalmente.</p>
+        </div>
+        <div style="margin-bottom: 0;">
+            <h5 style="background: linear-gradient(90deg, #1E3A8A 0%, #3B82F6 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 700; margin: 0 0 0.2rem 0; font-size: 0.9rem; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">Trazabilidad End-to-End</h5>
+            <p style="color: #475569; margin: 0; font-size: 0.75rem; line-height: 1.3; font-weight: 400; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">Desde el CSV crudo hasta la predicción en producción: cada dato validado, cada experimento registrado, cada deployment trackeado. Fundamental para debugging, auditorías y regulaciones.</p>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
     
     st.markdown("---")
     
@@ -2029,429 +2028,55 @@ git push origin main
             """, unsafe_allow_html=True)
             
             # Contenido exacto del archivo contexto.md
-            contexto_content = """   predecir-puntaje-icfes-final/
- │
- ├── 📄 README.md (600+ líneas)
- │   └─ ROL: Documentación completa del proyecto
- │      ├─ Guía de instalación y setup
- │      ├─ Manual de uso (entrenamiento, API, predicciones)
- │      ├─ Descripción de arquitectura MLOps
- │      ├─ Ejemplos de código y comandos
- │      ├─ Troubleshooting y FAQ
- │      └─ Showcase profesional para portfolio
- │
- ├── 📄 config.yaml
- │   └─ ROL: Configuración centralizada de TODO el proyecto
- │      ├─ Paths de datos y modelos
- │      ├─ Nombres de features y target
- │      ├─ Hiperparámetros de entrenamiento (test_size, cv_folds, optuna_trials)
- │      ├─ Configuración de MLflow (tracking_uri, experiment_name)
- │      ├─ Configuración de API (host, port)
- │      └─ Single source of truth - Un solo lugar para modificar configs
- │
- ├── 📄 requirements.txt (170 dependencias)
- │   └─ ROL: Dependencias de Python para todo el proyecto
- │      ├─ ML: scikit-learn, xgboost, numpy, pandas
- │      ├─ MLOps: mlflow, optuna, dvc, dvc-s3
- │      ├─ API: fastapi, uvicorn, pydantic
- │      ├─ Cloud: boto3, s3fs, aiobotocore
- │      ├─ Viz: matplotlib, seaborn
- │      └─ Usado por: pip install -r requirements.txt
- │
- ├── 🐳 Dockerfile
- │   └─ ROL: Containerización de la aplicación para producción
- │      ├─ Base image: python:3.9-slim (ligera)
- │      ├─ Instala dependencias (requirements.txt)
- │      ├─ Copia código fuente completo
- │      ├─ Expone puerto 8000
- │      ├─ CMD: uvicorn api.app:app (servidor ASGI)
- │      └─ Usado por: Docker Hub → Render deployment
- │
- ├── 📄 buildspec.yml
- │   └─ ROL: Pipeline CI/CD alternativo para AWS CodeBuild
- │      ├─ FASE 1 (install): Instala Python, DVC, dependencies
- │      ├─ FASE 2 (pre_build): dvc pull, docker login
- │      ├─ FASE 3 (build): python train_model.py, docker build
- │      ├─ FASE 4 (post_build): docker push, trigger Render webhook
- │      └─ Alternativa a GitHub Actions si se usa AWS CodePipeline
- │
- ├── 📄 .gitignore
- │   └─ ROL: Excluye archivos del control de versiones Git
- │      ├─ Excluye: venv/, __pycache__/, *.pyc, .DS_Store
- │      ├─ Excluye: mlruns/ (experimentos locales)
- │      ├─ NO excluye: *.dvc (punteros DVC SÍ van a Git)
- │      └─ Mantiene repositorio limpio
- │
- ├── 📄 .dvcignore
- │   └─ ROL: Excluye archivos del tracking de DVC
- │      ├─ Similar a .gitignore pero para DVC
- │      └─ Evita trackear archivos temporales con DVC
- │
- │
- ├── 📁 .git/ (directorio oculto)
- │   └─ ROL: Repositorio Git - Control de versiones del CÓDIGO
- │      ├─ Trackea: archivos .py, .yaml, .md, .dvc
- │      ├─ NO trackea: archivos binarios grandes (models/*.pkl, data/*.csv)
- │      ├─ Commits registran cambios en código
- │      └─ Remote: GitHub (código fuente)
- │
- │
- ├── 📁 .dvc/ (directorio oculto)
- │   ├─ 📄 config
- │   │   └─ ROL: Configuración de DVC
- │   │      ├─ Define remote: s3://proyecto-icfes-data
- │   │      ├─ Credenciales AWS (access_key_id, secret_access_key)
- │   │      └─ Cache local: .dvc/cache/
- │   │
- │   └─ 📁 cache/
- │       └─ ROL: Cache local de archivos trackeados por DVC
- │          ├─ Estructura: .dvc/cache/ba/7aaa439504b75...
- │          ├─ Almacena: modelos, datasets grandes
- │          └─ Sincroniza con S3 via dvc push/pull
- │
- │
- ├── 📁 .github/
- │   └── 📁 workflows/
- │       └── 📄 pipeline.yml (70 líneas)
- │           └─ ROL: Pipeline CI/CD automatizado con GitHub Actions
- │              ├─ TRIGGER: Push a branch "main"
- │              ├─ PASO 1: Checkout código
- │              ├─ PASO 2: Setup Python 3.9
- │              ├─ PASO 3: Install requirements + dvc[s3]
- │              ├─ PASO 4: Configure AWS credentials (secrets)
- │              ├─ PASO 5: dvc pull (descargar datos/modelos desde S3)
- │              ├─ PASO 6: Force MLflow tracking URI ($GITHUB_WORKSPACE/mlruns)
- │              ├─ PASO 7: python train_model/train_model.py
- │              ├─ PASO 8: Docker login (Docker Hub)
- │              ├─ PASO 9: docker build + push (tag: latest)
- │              ├─ PASO 10: Trigger Render deployment (webhook)
- │              └─ Tiempo total: ~8-10 minutos
- │
- │
- ├── 📁 .claude/ (directorio Claude Code CLI)
- │   └─ ROL: Configuración de Claude Code (tu asistente actual)
- │      └─ Hooks, comandos personalizados, settings
- │
- │
- ├── 📁 data/
- │   └── 📁 raw/
- │       └── 📄 data_train.csv.dvc
- │           └─ ROL: Puntero DVC al dataset de entrenamiento en S3
- │              ├─ Contiene: md5 hash, size, path
- │              ├─ Archivo real: s3://proyecto-icfes-data/...
- │              ├─ Tamaño real: 8.1 MB (~9,000 filas)
- │              ├─ Descarga con: dvc pull
- │              └─ Git trackea ESTE archivo (.dvc), no el CSV real
- │
- │
- ├── 📁 models/
- │   ├── 📄 best_model.pkl.dvc
- │   │   └─ ROL: Puntero DVC al modelo entrenado en S3
- │   │      ├─ md5: ba7aaa439504b75adaf13ef2a4693fc7
- │   │      ├─ size: 713,715 bytes (714 KB)
- │   │      ├─ Contenido real (en S3):
- │   │      │  └─ Pipeline([
- │   │      │      ('scaler', StandardScaler()),
- │   │      │      ('model', RandomForestRegressor(
- │   │      │        n_estimators=150, max_depth=18, ...
- │   │      │      ))
- │   │      │    ])
- │   │      ├─ Usado por: API en producción
- │   │      └─ Versionado: Cada cambio genera nuevo hash
- │   │
- │   └── 📄 model_metadata.pkl.dvc
- │       └─ ROL: Puntero DVC a metadata del modelo en S3
- │          ├─ size: 556 bytes
- │          ├─ Contenido real (en S3):
- │          │  └─ {
- │          │      "model_name": "RandomForest",
- │          │      "cv_r2_mean": 0.9840,
- │          │      "test_r2": 0.9820,
- │          │      "test_mae": 5.23,
- │          │      "mlflow_run_id": "abc123...",
- │          │      "feature_names": [...],
- │          │      "best_params": {...},
- │          │      "git_commit": "cadd00e",
- │          │      "data_hash": "0def2cc71...",
- │          │      "trained_at": "2024-11-18T18:07:00"
- │          │    }
- │          └─ Auditoría y reproducibilidad del modelo
- │
- │
- ├── 📁 api/
- │   └── 📄 app.py (189 líneas)
- │       └─ ROL: API REST con FastAPI para servir predicciones
- │          ├─ STARTUP:
- │          │  ├─ Carga best_model.pkl en memoria
- │          │  ├─ Carga model_metadata.pkl
- │          │  └─ Crea schema Pydantic dinámico desde config.yaml
- │          │
- │          ├─ ENDPOINTS:
- │          │  ├─ GET /
- │          │  │  └─ Info general de la API (versión, status, features)
- │          │  │
- │          │  ├─ GET /health
- │          │  │  └─ Health check (valida modelo cargado)
- │          │  │     Usado por: Render load balancer
- │          │  │
- │          │  ├─ POST /predict/
- │          │  │  └─ ENDPOINT PRINCIPAL
- │          │  │     ├─ Input: JSON con 5 features
- │          │  │     ├─ Validación: Pydantic schema automático
- │          │  │     ├─ Predicción: model.predict()
- │          │  │     ├─ Validación output: [0-500]
- │          │  │     └─ Output: {"prediction": 285.4, ...}
- │          │  │
- │          │  ├─ GET /config
- │          │  │  └─ Debugging - muestra configuración actual
- │          │  │
- │          │  └─ GET /docs
- │          │     └─ Swagger UI interactivo (automático FastAPI)
- │          │
- │          ├─ FEATURES:
- │          │  ├─ Logging estructurado
- │          │  ├─ Manejo robusto de errores (503, 500, 422)
- │          │  ├─ Schema dinámico (se adapta a config.yaml)
- │          │  └─ Configuración desde utils.config
- │          │
- │          └─ DEPLOYMENT:
- │             ├─ Comando: uvicorn api.app:app --host 0.0.0.0 --port 8000
- │             ├─ URL producción: https://prediccion-icfes-latest.onrender.com
- │             └─ Contenedor Docker en Render
- │
- │
- ├── 📁 train_model/
- │   └── 📄 train_model.py (600 líneas)
- │       └─ ROL: Script maestro de entrenamiento del modelo
- │          ├─ IMPORTS:
- │          │  ├─ utils.config (configuración)
- │          │  ├─ utils.data_clean (DataPipeline)
- │          │  ├─ sklearn, xgboost, optuna, mlflow
- │          │  └─ matplotlib, seaborn (visualizaciones)
- │          │
- │          ├─ FUNCIONES PRINCIPALES:
- │          │  ├─ get_git_commit_hash() / get_git_branch()
- │          │  │  └─ Trazabilidad: ¿Qué código generó este modelo?
- │          │  │
- │          │  ├─ calculate_data_hash(df)
- │          │  │  └─ Trazabilidad: ¿Qué datos generaron este modelo?
- │          │  │
- │          │  ├─ load_and_preprocess_data()
- │          │  │  └─ Ejecuta DataPipeline.run() → datos limpios
- │          │  │
- │          │  ├─ calculate_metrics(y_true, y_pred)
- │          │  │  └─ R², MAE, RMSE, MAPE
- │          │  │
- │          │  ├─ cross_validate_model(model, X, y, cv=5)
- │          │  │  └─ K-Fold CV manual con métricas por fold
- │          │  │
- │          │  ├─ create_objective_function(X, y, model_name)
- │          │  │  └─ Genera función objetivo para Optuna
- │          │  │     ├─ Define espacio de hiperparámetros
- │          │  │     ├─ Crea pipeline (scaler + modelo)
- │          │  │     ├─ 3-fold CV rápido
- │          │  │     └─ Retorna R² score
- │          │  │
- │          │  ├─ optimize_model(model_name, X, y, n_trials=50)
- │          │  │  └─ Optimización bayesiana con Optuna
- │          │  │     ├─ 50 trials por modelo
- │          │  │     ├─ Búsqueda adaptativa
- │          │  │     ├─ Progress bar
- │          │  │     └─ Retorna: best_params, study
- │          │  │
- │          │  ├─ train_optimized_model(...)
- │          │  │  └─ Entrena modelo final con mejores params
- │          │  │     ├─ 5-fold CV completo
- │          │  │     ├─ Fit en todo train set
- │          │  │     ├─ Evaluación en test set
- │          │  │     ├─ MLflow logging (params, metrics, tags)
- │          │  │     └─ Retorna: pipeline, métricas, run_id
- │          │  │
- │          │  └─ create_*_plot()
- │          │     ├─ Optimization history (Optuna trials)
- │          │     ├─ Feature importance
- │          │     ├─ Actual vs Predicted
- │          │     └─ Residuals distribution
- │          │
- │          ├─ FLUJO MAIN():
- │          │  1. Carga config.yaml
- │          │  2. Ejecuta DataPipeline (9,000 → 8,847 filas)
- │          │  3. Genera metadata (git hash, data hash, timestamp)
- │          │  4. Split train/test (80/20)
- │          │  5. Configura MLflow (./mlruns/)
- │          │  6. LOOP por 3 modelos:
- │          │     a. optimize_model() → 50 trials
- │          │     b. train_optimized_model() → CV + MLflow
- │          │     c. Guarda resultados
- │          │  7. Compara 3 modelos (tabla comparativa)
- │          │  8. Selecciona mejor (max CV R²)
- │          │  9. Guarda best_model.pkl (joblib)
- │          │  10. Guarda model_metadata.pkl (joblib)
- │          │
- │          ├─ OUTPUTS:
- │          │  ├─ models/best_model.pkl (714 KB)
- │          │  ├─ models/model_metadata.pkl (556 B)
- │          │  ├─ mlruns/ (experimentos MLflow)
- │          │  └─ plots_temp/*.png (visualizaciones)
- │          │
- │          └─ EJECUCIÓN:
- │             ├─ Local: python train_model/train_model.py
- │             ├─ CI/CD: Automático en GitHub Actions
- │             └─ Tiempo: ~12-15 minutos
- │
- │
- ├── 📁 utils/
- │   ├── 📄 config.py (83 líneas)
- │   │   └─ ROL: Gestión centralizada de configuración
- │   │      ├─ CLASE Config (Singleton):
- │   │      │  ├─ Carga config.yaml UNA sola vez
- │   │      │  ├─ Previene re-lecturas innecesarias
- │   │      │  └─ Thread-safe
- │   │      │
- │   │      ├─ PROPERTIES (acceso fácil):
- │   │      │  ├─ .features → List[str]
- │   │      │  ├─ .target_col → str
- │   │      │  ├─ .model_path → Path
- │   │      │  ├─ .metadata_path → Path
- │   │      │  ├─ .raw_data_path → Path
- │   │      │  └─ .processed_data_path → Path
- │   │      │
- │   │      ├─ MÉTODO .get(key, default):
- │   │      │  └─ Notación de puntos: config.get('training.test_size')
- │   │      │
- │   │      ├─ INSTANCIA GLOBAL:
- │   │      │  └─ config = Config()
- │   │      │
- │   │      └─ USADO POR:
- │   │         ├─ train_model/train_model.py
- │   │         ├─ api/app.py
- │   │         └─ utils/data_clean.py
- │   │
- │   └── 📄 data_clean.py (263 líneas)
- │       └─ ROL: Pipeline de limpieza y validación de datos
- │          ├─ CLASE DataPipeline:
- │          │  ├─ __init__(config_path="config.yaml")
- │          │  │  └─ Carga config, define columnas requeridas
- │          │  │
- │          │  ├─ load_raw_data()
- │          │  │  └─ pd.read_csv(data_path)
- │          │  │     Registra: raw_rows, raw_columns
- │          │  │
- │          │  ├─ select_required_columns(df)
- │          │  │  └─ Extrae solo 5 features + 1 target
- │          │  │     Valida: columnas existen
- │          │  │
- │          │  ├─ remove_duplicates(df)
- │          │  │  └─ df.drop_duplicates()
- │          │  │     Registra: duplicates_removed, percentage
- │          │  │
- │          │  ├─ remove_nulls(df)
- │          │  │  └─ df.dropna()
- │          │  │     Muestra: nulos por columna
- │          │  │     Registra: nulls_removed, percentage
- │          │  │
- │          │  ├─ validate_ranges(df)
- │          │  │  └─ Filtra valores fuera de rango:
- │          │  │     Features: [0, 100]
- │          │  │     Target: [0, 500]
- │          │  │     Registra: out_of_range_removed
- │          │  │
- │          │  ├─ reset_index(df)
- │          │  │  └─ df.reset_index(drop=True)
- │          │  │
- │          │  ├─ show_data_summary(df)
- │          │  │  └─ Estadísticas descriptivas (mean, median, std, min, max)
- │          │  │     Registra: clean_rows, statistics
- │          │  │
- │          │  └─ run() → DataFrame
- │          │     └─ PIPELINE COMPLETO (orquesta todos los métodos)
- │          │        1. load_raw_data()
- │          │        2. select_required_columns()
- │          │        3. remove_duplicates()
- │          │        4. remove_nulls()
- │          │        5. validate_ranges()
- │          │        6. reset_index()
- │          │        7. show_data_summary()
- │          │        └─ Retorna: DataFrame limpio
- │          │
- │          ├─ MÉTRICAS self.metrics:
- │          │  ├─ timestamp, input_file, pipeline_version
- │          │  ├─ raw_rows, clean_rows
- │          │  ├─ duplicates_removed (%, count)
- │          │  ├─ nulls_removed (%, count)
- │          │  ├─ out_of_range_removed (%, count)
- │          │  └─ statistics (dict de stats)
- │          │
- │          ├─ LOGGING:
- │          │  └─ Cada paso logguea información detallada
- │          │     Formato: timestamp - name - level - message
- │          │
- │          └─ USADO POR:
- │             └─ train_model/train_model.py
- │                (load_and_preprocess_data() lo llama)
- │
- │
- ├── 📁 plots_temp/
- │   ├── 📄 RandomForest_optimization_history.png
- │   │   └─ ROL: Visualización de optimización Optuna
- │   │      ├─ Eje X: Trial number (1-50)
- │   │      ├─ Eje Y: R² Score
- │   │      ├─ Línea azul: Valor de cada trial
- │   │      ├─ Línea roja: Mejor valor acumulado
- │   │      └─ Muestra convergencia de la búsqueda
- │   │
- │   ├── 📄 GradientBoosting_optimization_history.png
- │   │   └─ ROL: Igual que arriba, para GradientBoosting
- │   │
- │   └── 📄 XGBoost_optimization_history.png
- │       └─ ROL: Igual que arriba, para XGBoost
- │
- │
- ├── 📁 mlruns/ (generado por MLflow, NO en Git)
- │   └─ ROL: Base de datos local de experimentos MLflow
- │      ├─ ESTRUCTURA:
- │      │  mlruns/
- │      │  └── 0/  (experiment ID)
- │      │      ├── meta.yaml (metadata del experimento)
- │      │      └── abc123def456.../  (run ID)
- │      │          ├── meta.yaml (metadata del run)
- │      │          ├── metrics/
- │      │          │   ├── cv_r2_mean
- │      │          │   ├── cv_r2_std
- │      │          │   ├── test_r2
- │      │          │   ├── test_mae
- │      │          │   └── ...
- │      │          ├── params/
- │      │          │   ├── n_estimators
- │      │          │   ├── max_depth
- │      │          │   └── ...
- │      │          ├── tags/
- │      │          │   ├── git_commit
- │      │          │   ├── data_hash
- │      │          │   └── model_name
- │      │          └── artifacts/
- │      │
- │      ├─ ACCESO:
- │      │  └─ mlflow ui --backend-store-uri file:./mlruns
- │      │     Abre: http://localhost:5000
- │      │
- │      └─ FEATURES:
- │         ├─ Comparar múltiples runs
- │         ├─ Filtrar por tags, parámetros
- │         ├─ Visualizar métricas en gráficos
- │         └─ Descargar artifacts
- │
- │
- └── 📁 venv/ (entorno virtual, NO en Git)
-     └─ ROL: Entorno virtual de Python
-        ├─ Aislamiento de dependencias
-        ├─ Creado con: python3 -m venv venv
-        ├─ Activado con: source venv/bin/activate
-        ├─ Contiene: 170 paquetes instalados
-        └─ Estructura:
-           ├─ bin/ (ejecutables: python, pip, uvicorn, mlflow, etc.)
-           ├─ lib/python3.9/site-packages/ (paquetes instalados)
-           └─ pyvenv.cfg (configuración del entorno)
+            contexto_content = """ 
+predecir-puntaje-icfes-final/
+  │
+  ├── 📁 api/
+  │   └── app.py                          # API FastAPI - Endpoints REST y startup del modelo
+  │
+  ├── 📁 train_model/
+  │   └── train_model.py                  # Pipeline completo de entrenamiento con Optuna + MLflow
+  │
+  ├── 📁 utils/
+  │   ├── data_clean.py                   # DataPipeline - Limpieza y validación de datos (7 pasos)
+  │   └── config.py                       # Singleton - Configuración centralizada del proyecto
+  │
+  ├── 📁 data/
+  │   └── raw/
+  │       ├── data_train.csv              # Dataset ICFES (~9K registros) - NO versionado en Git
+  │       └── data_train.csv.dvc          # Puntero DVC - Hash MD5 y referencia a S3
+  │
+  ├── 📁 models/
+  │   ├── best_model.pkl                  # Modelo RandomForest entrenado (714 KB) - NO en Git
+  │   ├── model_metadata.pkl              # Metadata: métricas, params, git hash - NO en Git
+  │   ├── best_model.pkl.dvc              # Puntero DVC - Hash MD5 del modelo
+  │   └── model_metadata.pkl.dvc          # Puntero DVC - Hash MD5 de metadata
+  │
+  ├── 📁 plots_temp/
+  │   ├── RandomForest_optimization_history.png      # Gráfica Optuna trials RandomForest
+  │   ├── GradientBoosting_optimization_history.png  # Gráfica Optuna trials GradientBoosting
+  │   └── XGBoost_optimization_history.png           # Gráfica Optuna trials XGBoost
+  │
+  ├── 📁 mlruns/
+  │   └── [experiments]/                  # MLflow tracking - Logs de experimentos locales
+  │
+  ├── 📁 .github/
+  │   └── workflows/
+  │       └── pipeline.yml                # GitHub Actions - CI/CD automatizado
+  │
+  ├── 📁 .dvc/
+  │   └── config                          # Configuración DVC - Remote S3 bucket
+  │
+  ├── 📁 venv/                             # Virtual environment Python (ignorado por Git)
+  │
+  ├── config.yaml                         # Configuración central - Features, paths, parámetros
+  ├── requirements.txt                    # Dependencias Python (170 paquetes)
+  ├── Dockerfile                          # Containerización - Build imagen Docker
+  ├── .dvcignore                          # Archivos ignorados por DVC
+  ├── .gitignore                          # Archivos ignorados por Git
+  ├── buildspec.yml                       # AWS CodeBuild spec (alternativa a GitHub Actions)
+  └── README.md                           # Documentación completa del proyecto
+
 """
             
             # Renderizar el contenido con formato monospace para preservar el formato ASCII
@@ -2648,39 +2273,6 @@ Response (200 OK):
 # ├─ Mismo contenido que /docs
 # └─ Auto-generado por FastAPI""",
                     "info": "Documentación alternativa en formato ReDoc, más legible para lectura estática"
-                },
-                {
-                    "num": 7,
-                    "title": "GET /openapi - Especificación OpenAPI JSON",
-                    "icon": "📄",
-                    "color": "#10B981",
-                    "code": """GET https://prediccion-icfes-latest.onrender.com/openapi
-
-Response (200 OK):
-{
-    "openapi": "3.0.0",
-    "info": {
-        "title": "ICFES Prediction API",
-        "version": "1.0.0"
-    },
-    "paths": {
-        "/predict/": {
-            "post": {
-                "requestBody": {...},
-                "responses": {
-                    "200": {...},
-                    "422": {...},
-                    "503": {...}
-                }
-            }
-        },
-        ...
-    },
-    "components": {
-        "schemas": {...}
-    }
-}""",
-                    "info": "Especificación OpenAPI 3.0 en formato JSON. Usado por herramientas de terceros para generar clientes automáticamente"
                 }
             ]
             
@@ -2956,14 +2548,14 @@ Response (200 OK):
                     "code": """┌──────────────────┐
 │  FASTAPI APP     │  (Framework)
 │  + Middleware    │
-└────────┬─────────┘
-         │
-    ┌────┼────┐
-    ▼    ▼    ▼
-┌──────┐┌──────┐┌──────┐
-│ROUTING││PYDANTIC││CONFIG│
-│Layer ││Validation││Manager│
-└──────┘└──────┘└──────┘
+└──────────────┬─────────┘
+               │
+    ┌──────────┼───────────┐
+    ▼          ▼           ▼
+┌───────┐ ┌────────────┐┌───────┐
+│ROUTING│ │PYDANTIC    ││CONFIG │
+│Layer  │ │Validation  ││Manager│
+└───────┘ └────────────┘└───────┘
 
 # api/app.py (189 líneas)
 app = FastAPI(
